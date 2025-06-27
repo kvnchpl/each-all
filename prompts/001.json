@@ -1,23 +1,5 @@
 [
   {
-    "username": "mamaearth",
-    "timestamp": "2025-04-27T12:00:00Z",
-    "caption": "This is the porch where we used to sit every evening.",
-    "imageData": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD"
-  },
-  {
-    "username": "chimneycat",
-    "timestamp": "2025-05-27T12:30:00Z",
-    "caption": "My grandmother’s kitchen window.",
-    "imageData": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD"
-  },
-  {
-    "username": "neighborhoodsun",
-    "timestamp": "2025-06-27T13:00:00Z",
-    "caption": "My old block in early spring.",
-    "imageData": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD"
-  },
-  {
     "username": "user_e4lymkim",
     "caption": "",
     "timestamp": "2025-06-27T18:10:17.238Z",
