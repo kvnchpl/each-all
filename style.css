@@ -23,6 +23,7 @@
     --highlight-color: blue;
 }
 
+/* Global Styles */
 body {
     background-color: var(--bg-color-light);
     color: var(--text-color-dark);
@@ -38,6 +39,7 @@ h1 {
     margin-bottom: var(--padding-base);
 }
 
+/* Prompt Grid (Homepage) */
 #prompt-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
@@ -48,7 +50,6 @@ h1 {
     position: relative;
     z-index: 1;
 }
-
 
 .prompt-tile {
     color: var(--highlight-color);
@@ -64,6 +65,7 @@ h1 {
     font-weight: bold;
 }
 
+/* Modal Layout */
 #submission-modal {
     display: none;
     background-color: var(--bg-color-light);
@@ -88,6 +90,31 @@ h1 {
     z-index: -1;
 }
 
+#modal-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    width: 15vw;
+    max-width: 15vw;
+    padding: var(--padding-base);
+    background-color: var(--bg-color-dark);
+}
+
+.modal-top,
+.modal-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: var(--padding-small);
+    margin-bottom: var(--padding-extra-large);
+}
+
+#modal-header input {
+    flex: 0 0 auto;
+    min-width: 100px;
+}
+
+/* Modal Inputs and Buttons */
 .modal-input,
 .modal-button {
     width: 100%;
@@ -115,6 +142,22 @@ h1 {
     background-color: var(--highlight-color);
 }
 
+/* Modal Text Display */
+#prompt-text {
+    text-align: left;
+    color: var(--text-color-light);
+}
+
+#filename-preview {
+    color: var(--text-color-light);
+    font-size: 12px;
+    text-align: center;
+    height: 1.2em;
+    line-height: 1.2em;
+    text-overflow: ellipsis;
+}
+
+/* Image Submission Display */
 #submissions-container {
     position: relative;
     height: 100%;
@@ -150,44 +193,7 @@ h1 {
     opacity: 1;
 }
 
-#modal-header {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-    width: 15vw;
-    max-width: 15vw;
-    padding: var(--padding-base);
-    background-color: var(--bg-color-dark);
-}
-
-.modal-top,
-.modal-bottom {
-    display: flex;
-    flex-direction: column;
-    gap: var(--padding-small);
-    margin-bottom: var(--padding-extra-large);
-}
-
-#modal-header input {
-    flex: 0 0 auto;
-    min-width: 100px;
-}
-
-#prompt-text {
-    text-align: left;
-    color: var(--text-color-light);
-}
-
-#filename-preview {
-    color: var(--text-color-light);
-    font-size: 12px;
-    text-align: center;
-    height: 1.2em;
-    line-height: 1.2em;
-    text-overflow: ellipsis;
-}
-
+/* Responsive Styles */
 @media (max-width: 600px) {
     #prompt-grid {
         grid-template-columns: 1fr;
