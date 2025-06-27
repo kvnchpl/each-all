@@ -35,6 +35,7 @@ body {
     padding: var(--padding-base);
     text-align: center;
     text-transform: lowercase;
+    -webkit-font-smoothing: antialiased;
 }
 
 h1 {
