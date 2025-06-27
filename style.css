@@ -145,7 +145,7 @@ h1 {
 #modal-header input,
 #modal-header textarea {
     width: auto;
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     min-width: 100px;
 }
 
@@ -154,8 +154,6 @@ h1 {
     font-size: var(--font-size-base);
     padding: var(--padding-extra-small);
     width: 100%;
-    flex: 0 0 auto;
-    height: auto;
 }
 
 #prompt-text {
