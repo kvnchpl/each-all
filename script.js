@@ -114,6 +114,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
         .then(submissions => {
             if (!Array.isArray(submissions) || submissions.length === 0) {
                 console.log("No submissions yet.");
+                container.innerHTML = "<p style='padding: 1em;'>No submissions yet. Be the first!</p>";
                 return;
             }
 
