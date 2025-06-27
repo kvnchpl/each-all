@@ -231,3 +231,33 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("submit-button").addEventListener("click", handleSubmit);
     document.getElementById("return-button").addEventListener("click", closeModal);
 });
+
+// ==== IMAGE PREVIEW HANDLER ====
+
+document.getElementById("image-input").addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    const previewContainer = document.getElementById("file-preview");
+    previewContainer.innerHTML = "";
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = document.createElement("img");
+            img.src = e.target.result;
+            img.alt = file.name;
+            img.style.maxWidth = "100px";
+            img.style.maxHeight = "100px";
+            img.style.display = "block";
+            img.style.margin = "0 auto";
+
+            const name = document.createElement("div");
+            name.textContent = file.name;
+            name.style.fontSize = "12px";
+            name.style.marginTop = "4px";
+
+            previewContainer.appendChild(img);
+            previewContainer.appendChild(name);
+        };
+        reader.readAsDataURL(file);
+    }
+});
