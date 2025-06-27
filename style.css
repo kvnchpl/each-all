@@ -58,12 +58,12 @@ h1 {
     padding: var(--padding-base);
     margin: auto;
     width: 80%;
-    max-width: 500px;
 }
 
 #submission-modal input,
 #submission-modal textarea {
-    width: 90%;
+    width: 80%;
+    max-width: 400px;
     margin-bottom: var(--padding-small);
     padding: var(--padding-extra-small);
     font-family: inherit;
