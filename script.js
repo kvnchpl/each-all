@@ -96,7 +96,10 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
     document.getElementById("prompt-title").textContent = `Submit your image (Seed: ${seed})`;
 
     currentPromptId = promptId;
-    document.getElementById("submission-modal").style.display = "block";
+    const modal = document.getElementById("submission-modal");
+    if (modal) {
+        modal.style.display = "block";
+    }
 
     const container = document.getElementById("submissions-container");
     container.innerHTML = "Loading submissions...";

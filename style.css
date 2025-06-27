@@ -37,6 +37,8 @@ h1 {
     justify-content: center;
     gap: var(--padding-extra-small);
     margin-bottom: var(--padding-large);
+    position: relative;
+    z-index: 1;
 }
 
 #prompt-grid button {
@@ -53,7 +55,6 @@ h1 {
 }
 
 #submission-modal {
-    display: none;
     background-color: #fff;
     border: 2px solid var(--border-color);
     padding: var(--padding-base);
@@ -65,6 +66,17 @@ h1 {
     transform: translate(-50%, -50%);
     z-index: 1000;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+#submission-modal::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: -1;
 }
 
 #submission-modal input,
