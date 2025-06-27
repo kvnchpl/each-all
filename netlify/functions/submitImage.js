@@ -1,6 +1,8 @@
 const { Octokit } = require("@octokit/rest");
 
 exports.handler = async (event) => {
+    console.log("Incoming event:", event);
+
     if (event.httpMethod !== "POST") {
         return { statusCode: 405, body: "Method Not Allowed" };
     }
@@ -10,6 +12,8 @@ exports.handler = async (event) => {
     const GITHUB_USER = process.env.GITHUB_USER;
     const REPO_NAME = process.env.REPO_NAME;
 
+    console.log("Env vars:", { API_SECRET: !!API_SECRET, GITHUB_TOKEN: !!GITHUB_TOKEN, GITHUB_USER, REPO_NAME });
+
     if (!API_SECRET || !GITHUB_TOKEN || !GITHUB_USER || !REPO_NAME) {
         return {
             statusCode: 500,
@@ -18,11 +22,21 @@ exports.handler = async (event) => {
     }
 
     const headers = event.headers;
+    console.log("Headers:", headers);
+
     if (headers["x-api-secret"] !== API_SECRET) {
         return { statusCode: 403, body: "Forbidden" };
     }
 
-    const { username, promptId, caption, imageData } = JSON.parse(event.body || "{}");
+    let body;
+    try {
+        body = JSON.parse(event.body || "{}");
+    } catch (e) {
+        console.error("JSON parse error:", e);
+        return { statusCode: 400, body: "Malformed JSON body." };
+    }
+
+    const { username, promptId, caption, imageData } = body;
 
     if (!username || !promptId || !imageData) {
         return { statusCode: 400, body: "Missing required fields" };
@@ -32,7 +46,6 @@ exports.handler = async (event) => {
     const filePath = `prompts/${promptId}.json`;
 
     try {
-        // Get existing file content
         const { data: existingFile } = await octokit.repos.getContent({
             owner: GITHUB_USER,
             repo: REPO_NAME,
@@ -55,7 +68,6 @@ exports.handler = async (event) => {
 
         const commitMessage = `Add submission by ${username} to prompt ${promptId}`;
 
-        // Update the file on GitHub
         await octokit.repos.createOrUpdateFileContents({
             owner: GITHUB_USER,
             repo: REPO_NAME,
@@ -73,7 +85,7 @@ exports.handler = async (event) => {
         console.error("Error updating prompt file:", error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: "Failed to update submission." }),
+            body: JSON.stringify({ error: error.message || "Failed to update submission." }),
         };
     }
 };
