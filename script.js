@@ -163,7 +163,6 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
         })
         .catch(err => {
             console.error("Failed to load submissions:", err);
-            container.innerHTML = "<p>Error loading submissions.</p>";
         });
 }
 
