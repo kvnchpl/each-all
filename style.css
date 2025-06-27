@@ -195,7 +195,7 @@ h1 {
     color: var(--button-text-light);
 }
 
-#filename-preview {
+.filename-preview {
     color: var(--text-color-light);
 }
 
