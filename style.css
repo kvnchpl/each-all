@@ -131,8 +131,9 @@ h1 {
 
 #modal-header {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     flex-wrap: wrap;
     font-size: var(--font-size-base);
     margin-bottom: var(--padding-base);
