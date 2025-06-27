@@ -177,7 +177,8 @@ h1 {
     color: var(--text-color-light);
 }
 
-#file-label {
+#file-label,
+#submit-button {
     display: inline-block;
     background-color: var(--button-bg-light);
     color: var(--button-text-dark);
@@ -190,7 +191,8 @@ h1 {
     text-align: center;
 }
 
-#file-label:hover {
+#file-label:hover,
+#submit-button:hover {
     background-color: var(--highlight-color);
     color: var(--button-text-light);
 }
