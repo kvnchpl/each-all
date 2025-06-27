@@ -94,7 +94,7 @@ h1 {
     box-sizing: border-box;
     font-size: var(--font-size-base);
     font-family: inherit;
-    padding: var(--padding-small) var(--padding-base);
+    padding: var(--padding-small);
 }
 
 .modal-button {
