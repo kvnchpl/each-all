@@ -156,7 +156,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
 
                 const caption = document.createElement("div");
                 caption.className = "caption";
-                caption.textContent = `${sub.username}: ${sub.caption || "No caption"}`;
+                caption.textContent = sub.caption ? `${sub.username}: ${sub.caption}` : sub.username;
 
                 wrapper.appendChild(img);
                 wrapper.appendChild(caption);

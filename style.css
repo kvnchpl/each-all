@@ -122,7 +122,6 @@ h1 {
     white-space: nowrap;
     visibility: hidden;
     opacity: 0;
-    transition: opacity 0.2s;
     z-index: 10;
 }
 
