@@ -97,7 +97,8 @@ h1 {
     font-size: var(--font-size-base);
 }
 
-#submission-modal button {
+.modal-button {
+    display: inline-block;
     background-color: var(--button-bg-light);
     color: var(--button-text-dark);
     border: none;
@@ -106,6 +107,12 @@ h1 {
     font-size: var(--font-size-base);
     cursor: pointer;
     margin: 5px;
+    text-align: center;
+}
+
+.modal-button:hover {
+    background-color: var(--highlight-color);
+    color: var(--button-text-light);
 }
 
 #submission-modal button:hover {
@@ -175,24 +182,6 @@ h1 {
 #prompt-text {
     text-align: left;
     color: var(--text-color-light);
-}
-
-.modal-button {
-    display: inline-block;
-    background-color: var(--button-bg-light);
-    color: var(--button-text-dark);
-    border: none;
-    padding: var(--padding-small) var(--padding-base);
-    font-family: inherit;
-    font-size: var(--font-size-base);
-    cursor: pointer;
-    margin: 5px;
-    text-align: center;
-}
-
-.modal-button:hover {
-    background-color: var(--highlight-color);
-    color: var(--button-text-light);
 }
 
 #filename-preview {
