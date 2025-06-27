@@ -214,3 +214,7 @@ h1 {
     cursor: pointer;
     text-decoration: underline;
 }
+
+.uppercase {
+    text-transform: uppercase;
+}
