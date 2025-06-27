@@ -1,71 +1,90 @@
+:root {
+    --bg-color: #f5f5f5;
+    --text-color: #000;
+    --border-color: #000;
+    --font-family: 'Courier New', Courier, monospace;
+
+    --font-size-base: 14px;
+    --font-size-large: 32px;
+
+    --padding-base: 20px;
+    --pading-extra-small: calc(var(--padding-base) * 0.25);
+    --padding-small: calc(var(--padding-base) * 0.5);
+    --padding-large: calc(var(--padding-base) * 1.5);
+
+    --button-bg: #000;
+    --button-hover-bg: #333;
+    --button-text: #fff;
+}
+
 body {
-  background-color: #f5f5f5;
-  color: #000;
-  font-family: 'Courier New', Courier, monospace;
-  margin: 0;
-  padding: 20px;
-  text-align: center;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-family);
+    margin: 0;
+    padding: var(--padding-base);
+    text-align: center;
 }
 
 h1 {
-  font-size: 32px;
-  margin-bottom: 20px;
+    font-size: var(--font-size-large);
+    margin-bottom: var(--padding-base);
 }
 
 #prompt-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--padding-extra-small);
+    margin-bottom: var(--padding-large);
 }
 
 #prompt-grid button {
-  background-color: #fff;
-  border: 2px solid #000;
-  padding: 10px 20px;
-  font-family: inherit;
-  font-size: 16px;
-  cursor: pointer;
+    background-color: #fff;
+    border: 2px solid var(--border-color);
+    padding: var(--padding-small) var(--padding-base);
+    font-family: inherit;
+    font-size: 16px;
+    cursor: pointer;
 }
 
 #prompt-grid button:hover {
-  background-color: #eee;
+    background-color: #eee;
 }
 
 #submission-modal {
-  background-color: #fff;
-  border: 2px solid #000;
-  padding: 20px;
-  margin: auto;
-  width: 80%;
-  max-width: 500px;
+    background-color: #fff;
+    border: 2px solid var(--border-color);
+    padding: var(--padding-base);
+    margin: auto;
+    width: 80%;
+    max-width: 500px;
 }
 
 #submission-modal input,
 #submission-modal textarea {
-  width: 90%;
-  margin-bottom: 10px;
-  padding: 5px;
-  font-family: inherit;
-  font-size: 14px;
+    width: 90%;
+    margin-bottom: var(--padding-small);
+    padding: var(--padding-extra-small);
+    font-family: inherit;
+    font-size: var(--font-size-base);
 }
 
 #submission-modal button {
-  background-color: #000;
-  color: #fff;
-  border: none;
-  padding: 8px 16px;
-  font-family: inherit;
-  font-size: 14px;
-  cursor: pointer;
-  margin: 5px;
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    border: none;
+    padding: var(--padding-small) var(--padding-base);
+    font-family: inherit;
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    margin: 5px;
 }
 
 #submission-modal button:hover {
-  background-color: #333;
+    background-color: var(--button-hover-bg);
 }
 
 #submissions-container img {
-  border: 1px solid #000;
+    border: 1px solid var(--border-color);
 }
