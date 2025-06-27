@@ -100,7 +100,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
         .then(res => res.json())
         .then(prompts => {
             const promptObj = prompts.find(p => p.id === promptId);
-            document.getElementById("prompt-text").textContent = promptObj ? promptObj.prompt : `Prompt ${promptId}`;
+            document.getElementById("prompt-text").textContent = promptObj ? `${promptId}: ${promptObj.prompt}` : promptId;
         });
 
     const modal = document.getElementById("submission-modal");
