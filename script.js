@@ -113,20 +113,19 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
         .then(res => {
             if (!res.ok) {
                 console.warn(`No submission file yet for prompt ${promptId}.`);
-                container.innerHTML = "<p style='padding: 1em;'>No submissions yet. Be the first!</p>";
                 return [];
             }
             return res.json();
         })
         .then(submissions => {
             if (!Array.isArray(submissions) || submissions.length === 0) {
-                container.innerHTML = "<p style='padding: 1em;'>No submissions yet. Be the first!</p>";
+                console.warn(`No submissions found for prompt ${promptId}.`);
                 return;
             }
 
             container.innerHTML = "";
             container.style.position = "relative";
-            container.style.height = "400px"; // or any fixed height
+            container.style.height = "400px";
 
             function seededRandom(seed) {
                 var x = Math.sin(seed++) * 10000;
