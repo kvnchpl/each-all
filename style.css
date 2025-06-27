@@ -146,6 +146,14 @@ h1 {
     min-width: 100px;
 }
 
+#username-input {
+    font-family: inherit;
+    font-size: var(--font-size-base);
+    padding: var(--padding-extra-small);
+    min-width: 100px;
+    flex: 1 1 auto;
+}
+
 #prompt-text {
     text-align: left;
 }

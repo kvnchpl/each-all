@@ -55,7 +55,7 @@ async function submitImage(promptId, fileInput, captionInput) {
     }
 
     const imageData = await resizeAndCompressImage(file);
-    const username = getUsername() || getOrCreateUsername();
+    const username = document.getElementById("username-input").value.trim() || getOrCreateUsername();
     const caption = captionInput.value;
 
     const payload = {
@@ -214,6 +214,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 grid.appendChild(button);
             });
         });
+
+    // Prefill username input and add listener
+    const usernameInput = document.getElementById("username-input");
+    const savedUsername = getUsername() || getOrCreateUsername();
+    usernameInput.value = savedUsername;
+    usernameInput.addEventListener("input", () => {
+        setUsername(usernameInput.value);
+    });
 
     // Attach modal control button listeners
     document.getElementById("submit-button").addEventListener("click", handleSubmit);
