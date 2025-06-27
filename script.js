@@ -105,7 +105,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
 
     const modal = document.getElementById("submission-modal");
     if (modal) {
-        modal.style.display = "block";
+        modal.style.display = "flex";
     }
 
     const container = document.getElementById("submissions-container");

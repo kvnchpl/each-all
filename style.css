@@ -53,6 +53,7 @@ h1 {
 }
 
 #submission-modal {
+    display: none;
     background-color: #fff;
     padding: var(--padding-base);
     margin: auto;
