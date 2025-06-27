@@ -15,14 +15,11 @@ exports.handler = async (event) => {
         return { statusCode: 405, body: "Method Not Allowed" };
     }
 
-    const API_SECRET = process.env.API_SECRET;
     const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
     const GITHUB_USER = process.env.GITHUB_USER;
     const REPO_NAME = process.env.REPO_NAME;
 
-    console.log("Env vars:", { API_SECRET: !!API_SECRET, GITHUB_TOKEN: !!GITHUB_TOKEN, GITHUB_USER, REPO_NAME });
-
-    if (!API_SECRET || !GITHUB_TOKEN || !GITHUB_USER || !REPO_NAME) {
+    if (!GITHUB_TOKEN || !GITHUB_USER || !REPO_NAME) {
         return {
             statusCode: 500,
             body: "Server misconfiguration: missing environment variables.",
@@ -31,10 +28,6 @@ exports.handler = async (event) => {
 
     const headers = event.headers;
     console.log("Headers:", headers);
-
-    if (headers["x-api-secret"] !== API_SECRET) {
-        return { statusCode: 403, body: "Forbidden" };
-    }
 
     let body;
     try {
