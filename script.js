@@ -94,6 +94,9 @@ async function submitImage(promptId, fileInput, captionInput) {
 let currentPromptId = "";
 
 function openPrompt(promptId) {
+    const seed = Math.floor(Math.random() * 1000000);
+    document.getElementById("prompt-title").textContent = `Submit your image (Seed: ${seed})`;
+
     currentPromptId = promptId;
     document.getElementById("submission-modal").style.display = "block";
 
@@ -109,13 +112,29 @@ function openPrompt(promptId) {
             }
 
             container.innerHTML = "";
-            submissions.forEach(sub => {
+            container.style.position = "relative";
+            container.style.height = "400px"; // or any fixed height
+
+            function seededRandom(seed) {
+                var x = Math.sin(seed++) * 10000;
+                return x - Math.floor(x);
+            }
+
+            submissions.forEach((sub, index) => {
                 const img = document.createElement("img");
                 img.src = sub.imageData;
                 img.alt = sub.caption || "User submission";
                 img.title = `${sub.username}: ${sub.caption || "No caption"}`;
-                img.style.maxWidth = "100px";
-                img.style.margin = "5px";
+                img.style.position = "absolute";
+                img.style.width = "100px";
+                img.style.height = "auto";
+
+                const randX = Math.floor(seededRandom(seed + index) * (container.clientWidth - 100));
+                const randY = Math.floor(seededRandom(seed + index + 1000) * (container.clientHeight - 100));
+
+                img.style.left = `${randX}px`;
+                img.style.top = `${randY}px`;
+
                 container.appendChild(img);
             });
         })
