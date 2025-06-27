@@ -87,8 +87,13 @@ h1 {
     z-index: -1;
 }
 
+.modal-input,
+.modal-button {
+    width: 100%;
+    box-sizing: border-box;
+}
+
 .modal-input {
-    width: 80%;
     margin-bottom: var(--padding-small);
     padding: var(--padding-extra-small);
     font-family: inherit;
@@ -96,7 +101,6 @@ h1 {
 }
 
 .modal-button {
-    width: 80%;
     display: inline-block;
     background-color: var(--button-bg-light);
     color: var(--button-text-dark);
@@ -165,9 +169,7 @@ h1 {
     margin-bottom: var(--padding-large);
 }
 
-#modal-header input,
-#modal-header textarea {
-    width: auto;
+#modal-header input{
     flex: 0 0 auto;
     min-width: 100px;
 }
