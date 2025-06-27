@@ -225,9 +225,11 @@ document.addEventListener("DOMContentLoaded", () => {
         setUsername(usernameInput.value);
     });
 
-    // Attach modal control button listeners
+    // Add event listeners for buttons
     document.getElementById("submit-button").addEventListener("click", handleSubmit);
+
     document.getElementById("return-button").addEventListener("click", closeModal);
+
     document.getElementById("randomize-button").addEventListener("click", () => {
         const url = new URL(window.location);
         const currentPrompt = url.searchParams.get("prompt");
@@ -237,6 +239,14 @@ document.addEventListener("DOMContentLoaded", () => {
             window.history.pushState({}, "", url);
             openPrompt(currentPrompt, newSeed);
         }
+    });
+
+    document.getElementById("about-button").addEventListener("click", () => {
+        document.getElementById("about-modal").style.display = "flex";
+    });
+
+    document.getElementById("about-close").addEventListener("click", () => {
+        document.getElementById("about-modal").style.display = "none";
     });
 });
 
