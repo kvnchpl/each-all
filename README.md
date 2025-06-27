@@ -16,7 +16,7 @@ Each All is a collaborative web project where users respond to creative prompts 
 
 ## Live Demo
 
-[https://kvnchpl.com/each-all/](https://kvnchpl.com/each-all/)
+[https://each-all.netlify.app](https://each-all.netlify.app)
 
 ---
 
