@@ -201,8 +201,7 @@ h1 {
     background-color: var(--bg-color-dark);
     color: var(--text-color-light);
     padding: var(--padding-large);
-    max-width: 500px;
-    border-radius: 4px;
+    max-width: 50vw;
 }
 
 #about-content p {
