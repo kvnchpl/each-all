@@ -79,6 +79,8 @@ async function submitImage(promptId, fileInput, captionInput) {
             alert("Submission successful! Please check this page in a few minutes to see your submission.");
             fileInput.value = "";
             captionInput.value = "";
+            document.getElementById("filename-preview").textContent = "";
+            form.reset();
         } else {
             alert("Submission failed. " + (result.error || "Unknown error"));
         }
@@ -181,8 +183,9 @@ function closeModal() {
 }
 
 function handleSubmit() {
-    const fileInput = document.getElementById("image-input");
-    const captionInput = document.getElementById("caption-input");
+    const form = document.getElementById("submission-form");
+    const fileInput = form.elements["image-input"];
+    const captionInput = form.elements["caption-input"];
     submitImage(currentPromptId, fileInput, captionInput);
 }
 
@@ -228,7 +231,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Add event listeners for buttons
-    document.getElementById("submit-button").addEventListener("click", handleSubmit);
+    document.getElementById("submission-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        handleSubmit();
+    });
 
     document.getElementById("return-button").addEventListener("click", closeModal);
 
