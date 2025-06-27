@@ -3,7 +3,7 @@
     --bg-color-dark: #000;
     --text-color-light: #fff;
     --text-color-dark: #000;
-    --font-family: serif;
+    --font-family: 'Times New Roman', serif;
 
     --font-size-base: 16px;
     --font-size-small: calc(var(--font-size-base) * 0.75);
