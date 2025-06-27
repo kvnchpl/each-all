@@ -107,3 +107,25 @@ function handleSubmit() {
     const captionInput = document.getElementById("caption-input");
     submitImage(currentPromptId, fileInput, captionInput);
 }
+
+// ==== PROMPT GRID INITIALIZATION ====
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Load prompt data
+    fetch("prompts.json")
+        .then((res) => res.json())
+        .then((prompts) => {
+            const grid = document.getElementById("prompt-grid");
+            grid.innerHTML = ""; // Clear placeholder content
+            prompts.forEach((prompt) => {
+                const button = document.createElement("button");
+                button.textContent = `Prompt ${prompt.id}`;
+                button.addEventListener("click", () => openPrompt(prompt.id));
+                grid.appendChild(button);
+            });
+        });
+
+    // Attach modal control button listeners
+    document.getElementById("submit-button").addEventListener("click", handleSubmit);
+    document.getElementById("cancel-button").addEventListener("click", closeModal);
+});
