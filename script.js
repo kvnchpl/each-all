@@ -92,8 +92,7 @@ async function submitImage(promptId, fileInput, captionInput) {
 
 let currentPromptId = "";
 
-function openPrompt(promptId) {
-    const seed = Math.floor(Math.random() * 1000000);
+function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
     document.getElementById("prompt-title").textContent = `Submit your image (Seed: ${seed})`;
 
     currentPromptId = promptId;
@@ -126,8 +125,6 @@ function openPrompt(promptId) {
                 grouped[sub.username].push(sub);
             });
 
-            // Pick one random submission per user
-            const seed = Math.floor(Math.random() * 1000000);
             const usernames = Object.keys(grouped);
 
             usernames.forEach((username, i) => {
@@ -164,6 +161,10 @@ function openPrompt(promptId) {
 
 function closeModal() {
     document.getElementById("submission-modal").style.display = "none";
+    const url = new URL(window.location);
+    url.searchParams.delete("prompt");
+    url.searchParams.delete("seed");
+    window.history.pushState({}, "", url);
 }
 
 function handleSubmit() {
@@ -175,6 +176,14 @@ function handleSubmit() {
 // ==== PROMPT GRID INITIALIZATION ====
 
 document.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const promptId = urlParams.get("prompt");
+    const seed = urlParams.get("seed");
+
+    if (promptId) {
+        openPrompt(promptId, seed ? parseInt(seed) : undefined);
+    }
+
     // Load prompt data
     fetch("prompts.json")
         .then((res) => res.json())
@@ -184,7 +193,14 @@ document.addEventListener("DOMContentLoaded", () => {
             prompts.forEach((prompt) => {
                 const button = document.createElement("button");
                 button.textContent = `Prompt ${prompt.id}`;
-                button.addEventListener("click", () => openPrompt(prompt.id));
+                button.addEventListener("click", () => {
+                    const seed = Math.floor(Math.random() * 1000000);
+                    const url = new URL(window.location);
+                    url.searchParams.set("prompt", prompt.id);
+                    url.searchParams.set("seed", seed);
+                    window.history.pushState({}, "", url);
+                    openPrompt(prompt.id, seed);
+                });
                 grid.appendChild(button);
             });
         });
