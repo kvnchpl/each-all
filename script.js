@@ -110,10 +110,16 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
     console.log("Loading submissions...");
 
     fetch(`prompts/${promptId}.json`)
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                console.warn(`No submission file yet for prompt ${promptId}.`);
+                container.innerHTML = "<p style='padding: 1em;'>No submissions yet. Be the first!</p>";
+                return [];
+            }
+            return res.json();
+        })
         .then(submissions => {
             if (!Array.isArray(submissions) || submissions.length === 0) {
-                console.log("No submissions yet.");
                 container.innerHTML = "<p style='padding: 1em;'>No submissions yet. Be the first!</p>";
                 return;
             }
