@@ -109,7 +109,6 @@ h1 {
     font-family: inherit;
     font-size: var(--font-size-base);
     cursor: pointer;
-    margin: 5px;
     text-align: center;
 }
 
