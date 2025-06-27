@@ -1,6 +1,6 @@
 # EACH ALL - A Collective Image Sharing Project
 
-Each All is a collaborative web project where users respond to creative prompts by submitting images and captions. Submissions are displayed in a playful, randomized layout for each prompt.
+EACH ALL is a collaborative web project where users respond to creative prompts by submitting images and captions. Submissions are displayed in a playful, randomized layout for each prompt.
 
 ---
 
