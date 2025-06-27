@@ -93,9 +93,16 @@ async function submitImage(promptId, fileInput, captionInput) {
 let currentPromptId = "";
 
 function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
-    document.getElementById("prompt-title").textContent = `Submit your image (Seed: ${seed})`;
+    document.getElementById("seed-display").textContent = `Seed: ${seed}`;
 
     currentPromptId = promptId;
+    fetch("prompts.json")
+        .then(res => res.json())
+        .then(prompts => {
+            const promptObj = prompts.find(p => p.id === promptId);
+            document.getElementById("prompt-text").textContent = promptObj ? promptObj.text : `Prompt ${promptId}`;
+        });
+
     const modal = document.getElementById("submission-modal");
     if (modal) {
         modal.style.display = "block";

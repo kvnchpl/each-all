@@ -128,3 +128,21 @@ h1 {
     visibility: visible;
     opacity: 1;
 }
+
+#modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: var(--font-size-base);
+    margin-bottom: var(--padding-base);
+}
+
+#prompt-text {
+    text-align: left;
+}
+
+#seed-display {
+    text-align: right;
+    font-style: italic;
+    color: #666;
+}
