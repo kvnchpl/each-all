@@ -93,8 +93,6 @@ async function submitImage(promptId, fileInput, captionInput) {
 let currentPromptId = "";
 
 function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
-    document.getElementById("seed-display").textContent = seed;
-
     currentPromptId = promptId;
     fetch("prompts.json")
         .then(res => res.json())
