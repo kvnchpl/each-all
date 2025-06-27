@@ -113,7 +113,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
         .then(res => res.json())
         .then(submissions => {
             if (!Array.isArray(submissions) || submissions.length === 0) {
-                container.innerHTML = "<p>No submissions yet.</p>";
+                console.log("No submissions yet.");
                 return;
             }
 
@@ -196,7 +196,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .then((res) => res.json())
         .then((prompts) => {
             const grid = document.getElementById("prompt-grid");
-            grid.innerHTML = ""; // Clear placeholder content
+            grid.innerHTML = "";
             prompts.forEach((prompt) => {
                 const div = document.createElement("div");
                 div.className = "prompt-tile";
