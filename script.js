@@ -70,7 +70,7 @@ async function submitImage(promptId, fileInput, captionInput) {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "x-api-secret": "your-shared-secret" // Replace with a secure injected value
+                "x-api-secret": gMz39j29uhYLV656SqEL
             },
             body: JSON.stringify(payload)
         });
