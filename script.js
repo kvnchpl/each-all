@@ -201,9 +201,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const grid = document.getElementById("prompt-grid");
             grid.innerHTML = ""; // Clear placeholder content
             prompts.forEach((prompt) => {
-                const button = document.createElement("button");
-                button.textContent = `Prompt ${prompt.id}`;
-                button.addEventListener("click", () => {
+                const div = document.createElement("div");
+                div.className = "prompt-tile";
+                div.textContent = `Prompt ${prompt.id}`;
+                div.addEventListener("click", () => {
                     const seed = Math.floor(Math.random() * 1000000);
                     const url = new URL(window.location);
                     url.searchParams.set("prompt", prompt.id);
@@ -211,7 +212,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     window.history.pushState({}, "", url);
                     openPrompt(prompt.id, seed);
                 });
-                grid.appendChild(button);
+                grid.appendChild(div);
             });
         });
 
