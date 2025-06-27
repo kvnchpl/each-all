@@ -109,7 +109,7 @@ h1 {
 }
 
 #submission-modal button:hover {
-    background-color: var(--button-hover-bg);
+    background-color: var(--highlight-color);
 }
 
 #submissions-container img {
@@ -191,7 +191,7 @@ h1 {
 }
 
 #file-label:hover {
-    background-color: var(--button-hover-bg);
+    background-color: var(--highlight-color);
     color: var(--button-text-light);
 }
 
