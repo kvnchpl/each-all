@@ -224,5 +224,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Attach modal control button listeners
     document.getElementById("submit-button").addEventListener("click", handleSubmit);
-    document.getElementById("cancel-button").addEventListener("click", closeModal);
+    document.getElementById("return-button").addEventListener("click", closeModal);
 });
