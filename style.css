@@ -87,4 +87,7 @@ h1 {
 
 #submissions-container img {
     border: 1px solid var(--border-color);
+    position: absolute;
+    width: 100px;
+    height: auto;
 }

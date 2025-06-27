@@ -140,9 +140,6 @@ function openPrompt(promptId) {
                 img.src = sub.imageData;
                 img.alt = sub.caption || "User submission";
                 img.title = `${sub.username}: ${sub.caption || "No caption"}`;
-                img.style.position = "absolute";
-                img.style.width = "100px";
-                img.style.height = "auto";
 
                 const randX = Math.floor(Math.sin(seed + i) * (container.clientWidth - 100)) % (container.clientWidth - 100);
                 const randY = Math.floor(Math.sin(seed + i + 1000) * (container.clientHeight - 100)) % (container.clientHeight - 100);
