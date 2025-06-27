@@ -136,18 +136,25 @@ function openPrompt(promptId) {
                 const randIndex = Math.floor(Math.sin(seed + i) * 10000) % userSubs.length;
                 const sub = userSubs[Math.abs(randIndex)];
 
-                const img = document.createElement("img");
-                img.src = sub.imageData;
-                img.alt = sub.caption || "User submission";
-                img.title = `${sub.username}: ${sub.caption || "No caption"}`;
-
                 const randX = Math.floor(Math.sin(seed + i) * (container.clientWidth - 100)) % (container.clientWidth - 100);
                 const randY = Math.floor(Math.sin(seed + i + 1000) * (container.clientHeight - 100)) % (container.clientHeight - 100);
 
-                img.style.left = `${Math.abs(randX)}px`;
-                img.style.top = `${Math.abs(randY)}px`;
+                const wrapper = document.createElement("div");
+                wrapper.className = "submission-wrapper";
+                wrapper.style.left = `${Math.abs(randX)}px`;
+                wrapper.style.top = `${Math.abs(randY)}px`;
 
-                container.appendChild(img);
+                const img = document.createElement("img");
+                img.src = sub.imageData;
+                img.alt = sub.caption || "User submission";
+
+                const caption = document.createElement("div");
+                caption.className = "caption";
+                caption.textContent = `${sub.username}: ${sub.caption || "No caption"}`;
+
+                wrapper.appendChild(img);
+                wrapper.appendChild(caption);
+                container.appendChild(wrapper);
             });
         })
         .catch(err => {
