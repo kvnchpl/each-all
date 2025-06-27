@@ -1,7 +1,6 @@
 :root {
     --bg-color: #f5f5f5;
     --text-color: #000;
-    --border-color: #000;
     --font-family: 'Courier New', Courier, monospace;
 
     --font-size-base: 14px;
@@ -43,7 +42,6 @@ h1 {
 
 #prompt-grid button {
     background-color: #fff;
-    border: 2px solid var(--border-color);
     padding: var(--padding-small) var(--padding-base);
     font-family: inherit;
     font-size: 16px;
@@ -56,7 +54,6 @@ h1 {
 
 #submission-modal {
     background-color: #fff;
-    border: 2px solid var(--border-color);
     padding: var(--padding-base);
     margin: auto;
     width: 80%;
@@ -65,7 +62,6 @@ h1 {
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 1000;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 #submission-modal::before {
@@ -105,7 +101,6 @@ h1 {
 }
 
 #submissions-container img {
-    border: 1px solid var(--border-color);
     position: absolute;
     width: 100px;
     height: auto;
