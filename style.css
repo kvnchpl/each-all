@@ -155,7 +155,8 @@ h1 {
     flex-direction: column;
     justify-content: space-between;
     height: 100%;
-    max-width: 20vw;
+    width: 15vw;
+    max-width: 15vw;
     padding: var(--padding-base);
     background-color: var(--bg-color-dark);
 }
