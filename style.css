@@ -43,17 +43,15 @@ h1 {
 
 
 .prompt-tile {
-    background-color: #fff;
     padding: var(--padding-small) var(--padding-base);
     font-family: inherit;
     font-size: 16px;
     cursor: pointer;
     text-align: center;
-    border: 1px solid #ccc;
 }
 
 .prompt-tile:hover {
-    background-color: #eee;
+    background-color: #fff;
 }
 
 #submission-modal {
