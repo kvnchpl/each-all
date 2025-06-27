@@ -102,12 +102,24 @@ h1 {
     background-color: var(--bg-color-dark);
 }
 
-.modal-top,
-.modal-bottom {
+.flex-col {
     display: flex;
     flex-direction: column;
     gap: var(--padding-small);
-    margin-bottom: var(--padding-extra-large);
+}
+
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--padding-base);
+    background-color: var(--bg-color-dark);
+    padding: var(--padding-base);
+}
+
+#submission-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--padding-small);
 }
 
 /* Modal Inputs and Buttons */
@@ -214,15 +226,10 @@ h1 {
 }
 
 @media (max-width: 768px) {
-    #modal-header {
+    .modal-content {
         width: 90vw;
         max-width: none;
         height: auto;
-    }
-
-    .modal-top,
-    .modal-bottom {
-        margin-bottom: var(--padding-small);
     }
 
     #submission-modal {
