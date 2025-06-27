@@ -176,6 +176,8 @@ function closeModal() {
     url.searchParams.delete("prompt");
     url.searchParams.delete("seed");
     window.history.pushState({}, "", url);
+    document.getElementById("image-input").value = "";
+    document.getElementById("filename-preview").textContent = "";
 }
 
 function handleSubmit() {
