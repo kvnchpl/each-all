@@ -23,6 +23,7 @@ body {
     margin: 0;
     padding: var(--padding-base);
     text-align: center;
+    text-transform: lowercase;
 }
 
 h1 {
@@ -139,6 +140,7 @@ h1 {
     flex-direction: column;
     justify-content: space-between;
     height: 100%;
+    padding: var(--padding-base);
 }
 
 .modal-top,
