@@ -68,20 +68,27 @@ h1 {
     font-weight: bold;
 }
 
+/* Shared Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    background-color: var(--bg-color-light);
+    color: var(--text-color-dark);
+    z-index: 1000;
+    padding: var(--padding-base);
+}
+
 /* Modal Layout */
 #submission-modal {
-    display: none;
-    background-color: var(--bg-color-light);
-    padding: var(--padding-base);
     margin: auto;
-    width: 100vw;
-    height: 100vh;
-    position: fixed;
+    flex-direction: row;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 1000;
-    flex-direction: row;
 }
 
 #modal-header {
@@ -177,16 +184,7 @@ h1 {
     opacity: 1;
 }
 
-/* About Modal */
 #about-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 100vw;
-    background-color: var(--bg-color-light);
-    color: var(--text-color-dark);
     z-index: 1001;
     justify-content: center;
     align-items: center;
