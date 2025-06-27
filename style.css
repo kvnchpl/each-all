@@ -92,13 +92,9 @@ h1 {
 .modal-button {
     width: 100%;
     box-sizing: border-box;
-}
-
-.modal-input {
-    margin-bottom: var(--padding-small);
-    padding: var(--padding-extra-small);
-    font-family: inherit;
     font-size: var(--font-size-base);
+    font-family: inherit;
+    padding: var(--padding-small) var(--padding-base);
 }
 
 .modal-button {
@@ -106,9 +102,6 @@ h1 {
     background-color: var(--button-bg-light);
     color: var(--button-text-dark);
     border: none;
-    padding: var(--padding-small) var(--padding-base);
-    font-family: inherit;
-    font-size: var(--font-size-base);
     cursor: pointer;
     text-align: center;
 }
@@ -179,13 +172,6 @@ h1 {
 #modal-header input {
     flex: 0 0 auto;
     min-width: 100px;
-}
-
-#username-input {
-    font-family: inherit;
-    font-size: var(--font-size-base);
-    padding: var(--padding-extra-small);
-    width: 100%;
 }
 
 #prompt-text {
