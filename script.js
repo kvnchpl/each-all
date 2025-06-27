@@ -124,8 +124,6 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
             }
 
             container.innerHTML = "";
-            container.style.position = "relative";
-            container.style.height = "400px";
 
             function seededRandom(seed) {
                 var x = Math.sin(seed++) * 10000;

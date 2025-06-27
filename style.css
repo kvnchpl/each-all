@@ -121,6 +121,12 @@ h1 {
     background-color: var(--highlight-color);
 }
 
+#submissions-container {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
 #submissions-container img {
     position: absolute;
     width: 100px;
@@ -169,7 +175,7 @@ h1 {
     margin-bottom: var(--padding-large);
 }
 
-#modal-header input{
+#modal-header input {
     flex: 0 0 auto;
     min-width: 100px;
 }
