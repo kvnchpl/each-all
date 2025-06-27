@@ -1,0 +1,20 @@
+[
+    {
+        "username": "glitch_witch",
+        "timestamp": "2025-04-27T15:00:00Z",
+        "imageData": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD",
+        "caption": "My broken mirror selfie from 2012."
+    },
+    {
+        "username": "404hunter",
+        "timestamp": "2025-05-27T15:05:00Z",
+        "imageData": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD",
+        "caption": "What I see every time I wake up."
+    },
+    {
+        "username": "pixelghost",
+        "timestamp": "2025-06-27T15:10:00Z",
+        "imageData": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD",
+        "caption": "Corrupted family photo. Still my favorite."
+    }
+]
