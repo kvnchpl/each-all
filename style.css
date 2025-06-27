@@ -133,8 +133,17 @@ h1 {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
     font-size: var(--font-size-base);
     margin-bottom: var(--padding-base);
+    gap: var(--padding-small);
+}
+
+#modal-header input,
+#modal-header textarea {
+    width: auto;
+    flex: 1 1 auto;
+    min-width: 100px;
 }
 
 #prompt-text {
