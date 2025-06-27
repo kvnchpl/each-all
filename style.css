@@ -139,7 +139,7 @@ h1 {
     color: var(--text-color-light);
     font-size: var(--font-size-small);
     text-align: center;
-    height: 1.2em;
+    height: 2.4em;
     line-height: 1.2em;
     text-overflow: ellipsis;
 }
