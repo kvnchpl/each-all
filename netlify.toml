@@ -1,5 +1,5 @@
 [build]
-  publish = "./"          # This is your root directory
+  publish = "./"
   functions = "netlify/functions"
 
 [[redirects]]
