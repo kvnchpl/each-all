@@ -44,16 +44,17 @@ h1 {
 
 .prompt-tile {
     font-weight: bold;
+    color: blue;
     padding: var(--padding-small) var(--padding-base);
     font-family: inherit;
     font-size: 16px;
-    text-transform: underline;
+    text-decoration: underline;
     cursor: pointer;
     text-align: center;
 }
 
 .prompt-tile:hover {
-    color: blue;
+    color: var(--text-color);
 }
 
 #submission-modal {
