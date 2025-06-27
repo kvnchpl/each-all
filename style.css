@@ -177,10 +177,3 @@ h1 {
     visibility: visible;
     opacity: 1;
 }
-
-/* Responsive Styles */
-@media (max-width: 600px) {
-    #prompt-grid {
-        grid-template-columns: 1fr;
-    }
-}
