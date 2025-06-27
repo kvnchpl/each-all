@@ -15,12 +15,16 @@
 
     <div id="submission-modal">
         <div id="modal-header">
-            <button id="return-button">&#8592;</button>
-            <div id="prompt-text"></div>
-            <input type="text" id="username-input" placeholder="Username" />
-            <textarea id="caption-input" placeholder="Add a caption (optional)"></textarea>
-            <input type="file" id="image-input" accept="image/*" />
-            <button id="submit-button">Submit</button>
+            <div class="modal-top">
+                <button id="return-button">&#8592;</button>
+                <div id="prompt-text"></div>
+            </div>
+            <div class="modal-bottom">
+                <input type="text" id="username-input" placeholder="Username" />
+                <textarea id="caption-input" placeholder="Add a caption (optional)"></textarea>
+                <input type="file" id="image-input" accept="image/*" />
+                <button id="submit-button">Submit</button>
+            </div>
         </div>
         <div id="submissions-container" style="margin-top: 1em;"></div>
     </div>
