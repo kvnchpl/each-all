@@ -43,7 +43,6 @@ h1 {
 
 
 .prompt-tile {
-    font-weight: bold;
     color: blue;
     padding: var(--padding-small) var(--padding-base);
     font-family: inherit;
@@ -54,6 +53,7 @@ h1 {
 }
 
 .prompt-tile:hover {
+    font-weight: bold;
     color: var(--text-color);
 }
 
@@ -168,4 +168,10 @@ h1 {
     text-align: right;
     font-style: italic;
     color: #666;
+}
+
+@media (max-width: 600px) {
+    #prompt-grid {
+        grid-template-columns: 1fr;
+    }
 }
