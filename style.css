@@ -87,10 +87,8 @@ h1 {
     z-index: -1;
 }
 
-#submission-modal input,
-#submission-modal textarea {
+.modal-input {
     width: 80%;
-    max-width: 400px;
     margin-bottom: var(--padding-small);
     padding: var(--padding-extra-small);
     font-family: inherit;
@@ -98,6 +96,7 @@ h1 {
 }
 
 .modal-button {
+    width: 80%;
     display: inline-block;
     background-color: var(--button-bg-light);
     color: var(--button-text-dark);
@@ -153,6 +152,7 @@ h1 {
     flex-direction: column;
     justify-content: space-between;
     height: 100%;
+    max-width: 20vw;
     padding: var(--padding-base);
     background-color: var(--bg-color-dark);
 }
