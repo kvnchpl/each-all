@@ -5,8 +5,9 @@
     --text-color-dark: #000;
     --font-family: serif;
 
-    --font-size-base: 14px;
-    --font-size-large: 32px;
+    --font-size-base: 16px;
+    --font-size-small: calc(var(--font-size-base) * 0.75);
+    --font-size-large: calc(var(--font-size-base) * 2);
 
     --padding-base: 20px;
     --padding-extra-small: calc(var(--padding-base) * 0.25);
@@ -21,6 +22,8 @@
     --button-hover-bg: #333;
 
     --highlight-color: blue;
+
+    --img-width: 100px;
 }
 
 /* Global Styles */
@@ -55,7 +58,7 @@ h1 {
     color: var(--highlight-color);
     padding: var(--padding-small) var(--padding-base);
     font-family: inherit;
-    font-size: 16px;
+    font-size: var(--font-size-base);
     text-decoration: underline;
     cursor: pointer;
     text-align: center;
@@ -80,16 +83,6 @@ h1 {
     z-index: 1000;
 }
 
-#submission-modal::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: -1;
-}
-
 #modal-header {
     display: flex;
     flex-direction: column;
@@ -109,15 +102,11 @@ h1 {
     margin-bottom: var(--padding-extra-large);
 }
 
-#modal-header input {
-    flex: 0 0 auto;
-    min-width: 100px;
-}
-
 /* Modal Inputs and Buttons */
 .modal-input,
 .modal-button {
     width: 100%;
+    flex: 0 0 auto;
     box-sizing: border-box;
     font-size: var(--font-size-base);
     font-family: inherit;
@@ -138,10 +127,6 @@ h1 {
     color: var(--button-text-light);
 }
 
-#submission-modal button:hover {
-    background-color: var(--highlight-color);
-}
-
 /* Modal Text Display */
 #prompt-text {
     text-align: left;
@@ -150,7 +135,7 @@ h1 {
 
 #filename-preview {
     color: var(--text-color-light);
-    font-size: 12px;
+    font-size: var(--font-size-small);
     text-align: center;
     height: 1.2em;
     line-height: 1.2em;
@@ -166,7 +151,7 @@ h1 {
 
 #submissions-container img {
     position: absolute;
-    width: 100px;
+    width: var(--img-width);
     height: auto;
 }
 
@@ -180,7 +165,7 @@ h1 {
     left: 0;
     background: var(--highlight-color);
     color: var(--button-text-light);
-    font-size: 12px;
+    font-size: var(--font-size-small);
     padding: 2px 4px;
     white-space: nowrap;
     visibility: hidden;
