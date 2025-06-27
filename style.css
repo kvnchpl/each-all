@@ -1,6 +1,6 @@
 :root {
     --bg-color-light: #f5f5f5;
-    --bg-color-dark: #333;
+    --bg-color-dark: #000;
     --text-color-light: #fff;
     --text-color-dark: #000;
     --font-family: serif;
@@ -147,7 +147,7 @@ h1 {
     justify-content: space-between;
     height: 100%;
     padding: var(--padding-base);
-    background-color: #000;
+    background-color: var(--bg-color-dark);
 }
 
 .modal-top,
