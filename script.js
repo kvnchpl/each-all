@@ -120,7 +120,22 @@ function openPrompt(promptId) {
                 return x - Math.floor(x);
             }
 
-            submissions.forEach((sub, index) => {
+            // Group submissions by username
+            const grouped = {};
+            submissions.forEach((sub) => {
+                if (!grouped[sub.username]) grouped[sub.username] = [];
+                grouped[sub.username].push(sub);
+            });
+
+            // Pick one random submission per user
+            const seed = Math.floor(Math.random() * 1000000);
+            const usernames = Object.keys(grouped);
+
+            usernames.forEach((username, i) => {
+                const userSubs = grouped[username];
+                const randIndex = Math.floor(Math.sin(seed + i) * 10000) % userSubs.length;
+                const sub = userSubs[Math.abs(randIndex)];
+
                 const img = document.createElement("img");
                 img.src = sub.imageData;
                 img.alt = sub.caption || "User submission";
@@ -129,11 +144,11 @@ function openPrompt(promptId) {
                 img.style.width = "100px";
                 img.style.height = "auto";
 
-                const randX = Math.floor(seededRandom(seed + index) * (container.clientWidth - 100));
-                const randY = Math.floor(seededRandom(seed + index + 1000) * (container.clientHeight - 100));
+                const randX = Math.floor(Math.sin(seed + i) * (container.clientWidth - 100)) % (container.clientWidth - 100);
+                const randY = Math.floor(Math.sin(seed + i + 1000) * (container.clientHeight - 100)) % (container.clientHeight - 100);
 
-                img.style.left = `${randX}px`;
-                img.style.top = `${randY}px`;
+                img.style.left = `${Math.abs(randX)}px`;
+                img.style.top = `${Math.abs(randY)}px`;
 
                 container.appendChild(img);
             });
