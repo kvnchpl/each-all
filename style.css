@@ -31,24 +31,28 @@ h1 {
 }
 
 #prompt-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--padding-extra-small);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: var(--padding-small);
+    justify-items: center;
+    align-items: center;
     margin-bottom: var(--padding-large);
     position: relative;
     z-index: 1;
 }
 
-#prompt-grid button {
+
+.prompt-tile {
     background-color: #fff;
     padding: var(--padding-small) var(--padding-base);
     font-family: inherit;
     font-size: 16px;
     cursor: pointer;
+    text-align: center;
+    border: 1px solid #ccc;
 }
 
-#prompt-grid button:hover {
+.prompt-tile:hover {
     background-color: #eee;
 }
 
