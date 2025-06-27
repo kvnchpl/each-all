@@ -195,13 +195,6 @@ h1 {
     color: var(--button-text-light);
 }
 
-#file-preview {
-    margin-top: var(--padding-small);
-    text-align: center;
-    font-family: inherit;
-    color: var(--text-color-dark);
-}
-
 @media (max-width: 600px) {
     #prompt-grid {
         grid-template-columns: 1fr;

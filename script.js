@@ -242,9 +242,6 @@ document.getElementById("image-input").addEventListener("change", (event) => {
     if (file) {
         const name = document.createElement("div");
         name.textContent = file.name;
-        name.style.fontSize = "12px";
-        name.style.marginTop = "4px";
-        name.style.textAlign = "center";
         previewContainer.appendChild(name);
     }
 });
