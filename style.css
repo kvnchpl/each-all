@@ -208,3 +208,9 @@ h1 {
     font-size: var(--font-size-base);
     line-height: 1.5;
 }
+
+#about-button {
+    color: var(--highlight-color);
+    cursor: pointer;
+    text-decoration: underline;
+}
