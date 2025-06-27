@@ -155,10 +155,6 @@ h1 {
     padding: var(--padding-extra-small);
     min-width: 100px;
     flex: 1 1 auto;
-    height: auto;
-    resize: none;
-    overflow-y: hidden;
-    white-space: nowrap;
 }
 
 #prompt-text {
