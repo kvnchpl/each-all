@@ -69,8 +69,7 @@ async function submitImage(promptId, fileInput, captionInput) {
         const res = await fetch("/.netlify/functions/submitImage", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
-                "x-api-secret": "gMz39j29uhYLV656SqEL"
+                "Content-Type": "application/json"
             },
             body: JSON.stringify(payload)
         });
