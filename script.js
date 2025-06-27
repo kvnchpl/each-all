@@ -230,6 +230,16 @@ document.addEventListener("DOMContentLoaded", () => {
     // Attach modal control button listeners
     document.getElementById("submit-button").addEventListener("click", handleSubmit);
     document.getElementById("return-button").addEventListener("click", closeModal);
+    document.getElementById("randomize-button").addEventListener("click", () => {
+        const url = new URL(window.location);
+        const currentPrompt = url.searchParams.get("prompt");
+        if (currentPrompt) {
+            const newSeed = Math.floor(Math.random() * 1000000);
+            url.searchParams.set("seed", newSeed);
+            window.history.pushState({}, "", url);
+            openPrompt(currentPrompt, newSeed);
+        }
+    });
 });
 
 // ==== IMAGE PREVIEW HANDLER ====
