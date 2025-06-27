@@ -236,13 +236,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 document.getElementById("image-input").addEventListener("change", (event) => {
     const file = event.target.files[0];
-    const previewContainer = document.getElementById("file-preview");
-    previewContainer.innerHTML = "";
-
-    if (file) {
-        const name = document.createElement("div");
-        name.textContent = file.name;
-        name.className = "filename-preview";
-        previewContainer.appendChild(name);
-    }
+    const previewContainer = document.getElementById("filename-preview");
+    previewContainer.textContent = file ? file.name : "";
 });

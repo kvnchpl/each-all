@@ -195,8 +195,14 @@ h1 {
     color: var(--button-text-light);
 }
 
-.filename-preview {
+#filename-preview {
     color: var(--text-color-light);
+    font-size: 12px;
+    text-align: center;
+    margin-top: 4px;
+    height: 1.2em;
+    line-height: 1.2em;
+    text-overflow: ellipsis;
 }
 
 @media (max-width: 600px) {
