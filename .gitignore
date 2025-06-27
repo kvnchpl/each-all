@@ -1,2 +1,13 @@
-# Local Netlify folder
-.netlify
+# Netlify build output (auto-generated)
+.netlify/
+
+# Node modules (don’t commit!)
+node_modules/
+
+# macOS metadata files
+.DS_Store
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
