@@ -96,6 +96,33 @@ let currentPromptId = "";
 function openPrompt(promptId) {
     currentPromptId = promptId;
     document.getElementById("submission-modal").style.display = "block";
+
+    const container = document.getElementById("submissions-container");
+    container.innerHTML = "Loading submissions...";
+
+    fetch(`prompts/${promptId}.json`)
+        .then(res => res.json())
+        .then(submissions => {
+            if (!Array.isArray(submissions) || submissions.length === 0) {
+                container.innerHTML = "<p>No submissions yet.</p>";
+                return;
+            }
+
+            container.innerHTML = "";
+            submissions.forEach(sub => {
+                const img = document.createElement("img");
+                img.src = sub.imageData;
+                img.alt = sub.caption || "User submission";
+                img.title = `${sub.username}: ${sub.caption || "No caption"}`;
+                img.style.maxWidth = "100px";
+                img.style.margin = "5px";
+                container.appendChild(img);
+            });
+        })
+        .catch(err => {
+            console.error("Failed to load submissions:", err);
+            container.innerHTML = "<p>Error loading submissions.</p>";
+        });
 }
 
 function closeModal() {
