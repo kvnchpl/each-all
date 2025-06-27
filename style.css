@@ -195,6 +195,10 @@ h1 {
     color: var(--button-text-light);
 }
 
+#filename-preview {
+    color: var(--text-color-light);
+}
+
 @media (max-width: 600px) {
     #prompt-grid {
         grid-template-columns: 1fr;

@@ -242,6 +242,7 @@ document.getElementById("image-input").addEventListener("change", (event) => {
     if (file) {
         const name = document.createElement("div");
         name.textContent = file.name;
+        name.className = "filename-preview";
         previewContainer.appendChild(name);
     }
 });
