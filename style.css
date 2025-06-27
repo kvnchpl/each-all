@@ -12,6 +12,7 @@
     --pading-extra-small: calc(var(--padding-base) * 0.25);
     --padding-small: calc(var(--padding-base) * 0.5);
     --padding-large: calc(var(--padding-base) * 1.5);
+    --padding-extra-large: calc(var(--padding-base) * 2);
 
     --button-bg-light: #fff;
     --button-bg-dark: #000;
@@ -172,7 +173,7 @@ h1 {
     display: flex;
     flex-direction: column;
     gap: var(--padding-small);
-    margin-bottom: var(--padding-large);
+    margin-bottom: var(--padding-extra-large);
 }
 
 #modal-header input {
