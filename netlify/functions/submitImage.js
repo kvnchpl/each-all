@@ -46,6 +46,9 @@ exports.handler = async (event) => {
     const octokit = new Octokit({ auth: GITHUB_TOKEN });
     const filePath = `prompts/${promptId}.json`;
 
+    let submissions = [];
+    let sha = undefined;
+
     try {
         const { data: existingFile } = await octokit.repos.getContent({
             owner: GITHUB_USER,
@@ -54,8 +57,22 @@ exports.handler = async (event) => {
         });
 
         const contentJson = Buffer.from(existingFile.content, "base64").toString("utf-8");
-        const submissions = JSON.parse(contentJson);
+        submissions = JSON.parse(contentJson);
+        sha = existingFile.sha;
+    } catch (error) {
+        if (error.status === 404) {
+            // File does not exist yet — start with an empty array
+            submissions = [];
+        } else {
+            console.error("Error retrieving prompt file:", error);
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ error: error.message || "Failed to retrieve prompt file." }),
+            };
+        }
+    }
 
+    try {
         const newSubmission = {
             username,
             caption: caption || "",
@@ -75,7 +92,7 @@ exports.handler = async (event) => {
             path: filePath,
             message: commitMessage,
             content: updatedContent,
-            sha: existingFile.sha,
+            ...(sha && { sha }), // only include 'sha' if it exists
         });
 
         return {
