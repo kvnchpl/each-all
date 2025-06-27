@@ -88,3 +88,22 @@ async function submitImage(promptId, fileInput, captionInput) {
         alert("Submission error. Check the console for details.");
     }
 }
+
+// ==== PROMPT MODAL HANDLING ====
+
+let currentPromptId = "";
+
+function openPrompt(promptId) {
+    currentPromptId = promptId;
+    document.getElementById("submission-modal").style.display = "block";
+}
+
+function closeModal() {
+    document.getElementById("submission-modal").style.display = "none";
+}
+
+function handleSubmit() {
+    const fileInput = document.getElementById("image-input");
+    const captionInput = document.getElementById("caption-input");
+    submitImage(currentPromptId, fileInput, captionInput);
+}
