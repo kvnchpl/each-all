@@ -1,6 +1,14 @@
-const { Octokit } = require("@octokit/rest");
+let Octokit;
+(async () => {
+    const mod = await import("@octokit/rest");
+    Octokit = mod.Octokit;
+})();
 
 exports.handler = async (event) => {
+    while (!Octokit) {
+        await new Promise((res) => setTimeout(res, 10));
+    }
+
     console.log("Incoming event:", event);
 
     if (event.httpMethod !== "POST") {
