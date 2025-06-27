@@ -76,7 +76,7 @@ async function submitImage(promptId, fileInput, captionInput) {
 
         const result = await res.json();
         if (result.success) {
-            alert("Submission successful!");
+            alert("Submission successful! Please check this page in a few minutes to see your submission.");
             fileInput.value = "";
             captionInput.value = "";
         } else {
