@@ -154,10 +154,8 @@ h1 {
     font-size: var(--font-size-base);
     padding: var(--padding-extra-small);
     width: 100%;
-    box-sizing: border-box;
-    resize: none;
-    white-space: nowrap;
-    overflow: hidden;
+    flex: 0 0 auto;
+    height: auto;
 }
 
 #prompt-text {
