@@ -33,7 +33,7 @@ const SELECTORS = {
     aboutModal: "about-modal",
     aboutClose: "about-close",
     caption: "caption",
-    promptTile: "prompt-tile"
+    promptTile: "interactive-tile"
 }
 
 // ==== USERNAME MANAGEMENT ====

@@ -65,8 +65,7 @@ h1 {
     z-index: 1;
 }
 
-.prompt-tile,
-.control-button {
+.interactive-tile {
     color: var(--highlight-color);
     padding: var(--padding-small) var(--padding-base);
     font-family: inherit;
@@ -75,8 +74,7 @@ h1 {
     cursor: pointer;
 }
 
-.prompt-tile:hover,
-.control-button:hover {
+.interactive-tile:hover {
     font-weight: bold;
 }
 
