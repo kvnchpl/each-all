@@ -113,12 +113,12 @@ async function resizeAndCompressImage(file, quality = CONFIG.defaultImageQuality
 async function submitImage(promptId, fileInput, captionInput) {
     const file = fileInput.files[0];
     if (!file) {
-        alert("Please select an image file.");
+        alert("oops! you need to choose an image file before submitting.");
         return;
     }
     const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
     if (!allowedTypes.includes(file.type)) {
-        alert("Unsupported image format. Please upload a JPG, PNG, or WebP.");
+        alert("that file format isn’t supported. try uploading a jpg, png, or webp image.");
         return;
     }
 
@@ -132,7 +132,7 @@ async function submitImage(promptId, fileInput, captionInput) {
     const imageData = await resizeAndCompressImage(file, quality, maxDim);
     const username = document.getElementById(SELECTORS.usernameInput).value.trim();
     if (!username) {
-        alert("Please enter a username before submitting.");
+        alert("hey! make sure to add a username (can be a pseudonym of course).");
         return;
     }
     const caption = captionInput.value;
@@ -155,18 +155,18 @@ async function submitImage(promptId, fileInput, captionInput) {
 
         const result = await res.json();
         if (result.success) {
-            alert("Submission successful! Please check this page in a few minutes to see your submission.");
+            alert("thanks for sharing! your image has been submitted. check back in a minute or so to see it live.");
             fileInput.value = "";
             captionInput.value = "";
             document.getElementById(SELECTORS.filenamePreview).textContent = "";
             const form = document.getElementById(SELECTORS.submissionForm);
             form.reset();
         } else {
-            alert("Submission failed. " + (result.error || "Unknown error"));
+            alert("uh oh... something went wrong with your submission. " + (result.error || "please try again later."));
         }
     } catch (error) {
         console.error("Error submitting image:", error);
-        alert("Submission error. Check the console for details.");
+        alert("something went wrong while submitting. you can try peeking at the console for details, or try again in a bit.");
     }
 }
 
