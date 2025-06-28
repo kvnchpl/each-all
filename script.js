@@ -39,22 +39,15 @@ const SELECTORS = {
     sortIdButton: "sort-id-button"
 }
 
-// ==== USERNAME MANAGEMENT ====
+// ==== STATE VARIABLES ====
 
-// ==== POPULARITY SORT HELPER ====
-async function getPromptSubmissionCounts(prompts) {
-    const counts = await Promise.all(prompts.map(async (prompt) => {
-        try {
-            const res = await fetch(`${CONFIG.promptDataFolder}/${prompt.id}.json`);
-            if (!res.ok) return { id: prompt.id, count: 0 };
-            const data = await res.json();
-            return { id: prompt.id, count: Array.isArray(data) ? data.length : 0 };
-        } catch {
-            return { id: prompt.id, count: 0 };
-        }
-    }));
-    return counts;
-}
+let currentPromptId = "";
+let currentPrompts = [];
+let sortPopularDescending = true;
+let sortIdAscending = true;
+let sortIndicators = {};
+
+// ==== USERNAME MANAGEMENT ====
 
 function getOrCreateUsername() {
     let username = localStorage.getItem("eachAllUsername");
@@ -71,6 +64,22 @@ function setUsername(newUsername) {
 
 function getUsername() {
     return localStorage.getItem("eachAllUsername");
+}
+
+// ==== POPULARITY SORT HELPER ====
+
+async function getPromptSubmissionCounts(prompts) {
+    const counts = await Promise.all(prompts.map(async (prompt) => {
+        try {
+            const res = await fetch(`${CONFIG.promptDataFolder}/${prompt.id}.json`);
+            if (!res.ok) return { id: prompt.id, count: 0 };
+            const data = await res.json();
+            return { id: prompt.id, count: Array.isArray(data) ? data.length : 0 };
+        } catch {
+            return { id: prompt.id, count: 0 };
+        }
+    }));
+    return counts;
 }
 
 // ==== IMAGE RESIZING & COMPRESSION ====
@@ -159,6 +168,13 @@ async function submitImage(promptId, fileInput, captionInput) {
         console.error("Error submitting image:", error);
         alert("Submission error. Check the console for details.");
     }
+}
+
+function handleSubmit() {
+    const form = document.getElementById(SELECTORS.submissionForm);
+    const fileInput = form.elements[SELECTORS.imageInput];
+    const captionInput = form.elements[SELECTORS.captionInput];
+    submitImage(currentPromptId, fileInput, captionInput);
 }
 
 // ==== PROMPT MODAL HANDLING ====
@@ -297,11 +313,12 @@ function closeModal() {
     document.getElementById(SELECTORS.filenamePreview).textContent = "";
 }
 
-function handleSubmit() {
-    const form = document.getElementById(SELECTORS.submissionForm);
-    const fileInput = form.elements[SELECTORS.imageInput];
-    const captionInput = form.elements[SELECTORS.captionInput];
-    submitImage(currentPromptId, fileInput, captionInput);
+function handleToggleHeader(e) {
+    e.preventDefault();
+    const header = document.getElementById(SELECTORS.modalHeader);
+    const isMinimized = header.classList.toggle("minimized");
+    const toggleBtn = document.getElementById(SELECTORS.toggleHeader);
+    toggleBtn.textContent = isMinimized ? "↓" : "↑";
 }
 
 // ==== PROMPT GRID INITIALIZATION ====
@@ -325,13 +342,6 @@ function renderPromptTiles(promptArray) {
         grid.appendChild(div);
     });
 }
-
-// Event Handlers for Sorting, Random, Toggle Header
-let currentPrompts = [];
-let sortPopularDescending = true;
-let sortIdAscending = true;
-let sortIndicators = {};
-let currentPromptId = ""; // Moved closer to modal logic as requested
 
 async function handleSortByPopularity() {
     const counts = await getPromptSubmissionCounts(currentPrompts);
@@ -365,14 +375,6 @@ function handleRandomizeSeed() {
     }
 }
 
-function handleToggleHeader(e) {
-    e.preventDefault();
-    const header = document.getElementById(SELECTORS.modalHeader);
-    const isMinimized = header.classList.toggle("minimized");
-    const toggleBtn = document.getElementById(SELECTORS.toggleHeader);
-    toggleBtn.textContent = isMinimized ? "↓" : "↑";
-}
-
 function updateSortIndicators(activeKey, direction) {
     Object.keys(sortIndicators).forEach(key => {
         const btn = sortIndicators[key];
@@ -384,6 +386,8 @@ function updateSortIndicators(activeKey, direction) {
         }
     });
 }
+
+// ==== INITIALIZATION ON PAGE LOAD ====
 
 document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
