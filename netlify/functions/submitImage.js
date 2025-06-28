@@ -91,7 +91,7 @@ exports.handler = async (event) => {
                 timeZone: "America/New_York",
                 dateStyle: "full",
                 timeStyle: "short",
-            }).format(new Date());
+            }).format(new Date()).toLowerCase();
 
             await resend.emails.send({
                 from: process.env.FROM_EMAIL || 'no-reply@resend.dev',
