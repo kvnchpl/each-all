@@ -196,6 +196,18 @@ h1 {
     opacity: 1;
 }
 
+.caption-left {
+    text-align: left;
+    left: 0;
+    right: auto;
+}
+
+.caption-right {
+    text-align: right;
+    right: 0;
+    left: auto;
+}
+
 #about-modal {
     z-index: 1001;
     justify-content: center;

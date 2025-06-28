@@ -161,6 +161,14 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
                 const caption = document.createElement("div");
                 caption.className = "caption";
                 caption.textContent = sub.caption ? `${sub.username}: ${sub.caption}` : sub.username;
+                // Set caption alignment and position based on image position
+                const containerMidpoint = container.clientWidth / 2;
+                const wrapperX = Math.abs(randX);
+                if (wrapperX < containerMidpoint) {
+                    caption.classList.add("caption-left");
+                } else {
+                    caption.classList.add("caption-right");
+                }
 
                 wrapper.appendChild(img);
                 wrapper.appendChild(caption);
