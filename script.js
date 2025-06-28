@@ -21,7 +21,6 @@ const SELECTORS = {
     randomizeButton: "randomize-button",
     promptGrid: "prompt-grid",
     promptText: "prompt-text",
-
     aboutButton: "about-button",
     aboutModal: "about-modal",
     aboutClose: "about-close",
