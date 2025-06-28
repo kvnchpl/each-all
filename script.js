@@ -1,3 +1,5 @@
+// === CONFIGURATION VARIABLES ====
+
 const CONFIG = {
     promptsListPath: "prompts.json",
     promptDataFolder: "prompts",
