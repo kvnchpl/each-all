@@ -204,7 +204,7 @@ h1 {
 
 .caption-right {
     text-align: right;
-    right: var(--img-width) !important;
+    right: calc(var(--img-width) * -1) !important;
     left: auto !important;
 }
 
