@@ -12,7 +12,7 @@ const SELECTORS = {
     modalHeader: "modal-header",
     submissionModal: "submission-modal",
     submissionsContainer: "submissions-container",
-    submissionsWrapper: "submissions-wrapper",
+    submissionWrapper: "submission-wrapper",
     submissionForm: "submission-form",
     usernameInput: "username-input",
     imageInput: "image-input",
@@ -192,7 +192,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
                 const randY = Math.floor(Math.sin(seed + i + 1000) * (container.clientHeight - 100)) % (container.clientHeight - 100);
 
                 const wrapper = document.createElement("div");
-                wrapper.className = "submission-wrapper";
+                wrapper.className = SELECTORS.submissionWrapper;
                 wrapper.style.left = `${Math.abs(randX)}px`;
                 wrapper.style.top = `${Math.abs(randY)}px`;
 
@@ -204,7 +204,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
                 img.style.height = "auto";
 
                 const caption = document.createElement("div");
-                caption.className = "caption";
+                caption.className = SELECTORS.caption;
                 caption.textContent = sub.caption ? `${sub.username}: ${sub.caption}` : sub.username;
 
                 // Set caption alignment and position based on image position
@@ -219,6 +219,47 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
                 wrapper.appendChild(img);
                 wrapper.appendChild(caption);
                 container.appendChild(wrapper);
+
+                // Make wrapper draggable
+                let offsetX, offsetY;
+
+                wrapper.addEventListener("mousedown", (e) => {
+                    offsetX = e.clientX - wrapper.offsetLeft;
+                    offsetY = e.clientY - wrapper.offsetTop;
+
+                    function onMouseMove(e) {
+                        wrapper.style.left = `${e.clientX - offsetX}px`;
+                        wrapper.style.top = `${e.clientY - offsetY}px`;
+                    }
+
+                    function onMouseUp() {
+                        document.removeEventListener("mousemove", onMouseMove);
+                        document.removeEventListener("mouseup", onMouseUp);
+                    }
+
+                    document.addEventListener("mousemove", onMouseMove);
+                    document.addEventListener("mouseup", onMouseUp);
+                });
+
+                wrapper.addEventListener("touchstart", (e) => {
+                    const touch = e.touches[0];
+                    offsetX = touch.clientX - wrapper.offsetLeft;
+                    offsetY = touch.clientY - wrapper.offsetTop;
+
+                    function onTouchMove(e) {
+                        const touch = e.touches[0];
+                        wrapper.style.left = `${touch.clientX - offsetX}px`;
+                        wrapper.style.top = `${touch.clientY - offsetY}px`;
+                    }
+
+                    function onTouchEnd() {
+                        document.removeEventListener("touchmove", onTouchMove);
+                        document.removeEventListener("touchend", onTouchEnd);
+                    }
+
+                    document.addEventListener("touchmove", onTouchMove);
+                    document.addEventListener("touchend", onTouchEnd);
+                });
             });
         })
         .catch(err => {
@@ -324,10 +365,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (window.innerWidth <= 768) {
         let currentlyVisibleCaption = null;
 
-        document.querySelectorAll(SELECTORS.submissionsWrapper).forEach(wrapper => {
+        document.querySelectorAll("." + SELECTORS.submissionWrapper).forEach(wrapper => {
             wrapper.addEventListener("click", (event) => {
                 event.stopPropagation(); // Prevent the global click from triggering
-                const caption = wrapper.querySelector(SELECTORS.caption);
+                const caption = wrapper.querySelector("." + SELECTORS.caption);
                 if (!caption) return;
 
                 // Hide the currently visible caption if it's different
