@@ -36,7 +36,7 @@ function getUsername() {
 
 // ==== IMAGE RESIZING & COMPRESSION ====
 
-async function resizeAndCompressImage(file, quality = 0, maxDim = 200) {
+async function resizeAndCompressImage(file, quality = CONFIG.defaultImageQuality, maxDim = CONFIG.maxImageDimension) {
     const imageBitmap = await createImageBitmap(file);
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
