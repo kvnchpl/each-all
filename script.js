@@ -460,7 +460,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// ==== IMAGE PREVIEW HANDLER ====
+// ==== FILENAME PREVIEW HANDLER ====
 
 document.getElementById(SELECTORS.imageInput).addEventListener("change", (event) => {
     const file = event.target.files[0];
