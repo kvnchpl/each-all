@@ -1,3 +1,5 @@
+// submitImage.js
+//
 // Netlify function to handle image submissions to a GitHub repo.
 // Parses POST request, validates fields, updates GitHub file, and sends notification email.
 

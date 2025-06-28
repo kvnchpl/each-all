@@ -1,3 +1,9 @@
+// script.js
+//
+// Main script for EACH ALL project.
+// Handles image submission, prompt management, and UI interactions.
+// This script is designed to work in tandem with a Netlify backend (submitImage.js) for image submission. 
+
 /* CONFIGURATION VARIABLES */
 
 const CONFIG = {
