@@ -287,7 +287,8 @@ document.addEventListener("DOMContentLoaded", () => {
         handleSubmit();
     });
 
-    document.getElementById(SELECTORS.toggleHeader).addEventListener("click", () => {
+    document.getElementById(SELECTORS.toggleHeader).addEventListener("click", (e) => {
+        e.preventDefault();
         const header = document.getElementById(SELECTORS.modalHeader);
         const isMinimized = header.classList.toggle("minimized");
 
