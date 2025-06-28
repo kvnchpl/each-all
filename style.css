@@ -279,5 +279,12 @@ h1 {
 
     #toggle-header {
         display: block;
+        position: relative;
+        z-index: 1001;
+        width: 100%;
+        padding: var(--padding-small);
+        background-color: var(--bg-color-dark);
+        color: var(--text-color-light);
+        border: none;
     }
 }
