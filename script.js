@@ -33,7 +33,9 @@ const SELECTORS = {
     aboutModal: "about-modal",
     aboutClose: "about-close",
     caption: "caption",
-    promptTile: "interactive-tile"
+    promptTile: "interactive-tile",
+    sortPopularButton: "sort-popular-button",
+    sortIdButton: "sort-id-button"
 }
 
 // ==== USERNAME MANAGEMENT ====
@@ -349,8 +351,8 @@ document.addEventListener("DOMContentLoaded", () => {
             // Sort indicator state ===
             let activeSortButton = null;
             let sortIndicators = {
-                popular: document.getElementById("sort-popular-button"),
-                id: document.getElementById("sort-id-button")
+                popular: document.getElementById(SELECTORS.sortPopularButton),
+                id: document.getElementById(SELECTORS.sortIdButton)
             };
 
             function updateSortIndicators(activeKey, direction) {
@@ -365,7 +367,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             }
 
-            document.getElementById("sort-popular-button").addEventListener("click", async () => {
+            document.getElementById(SELECTORS.sortPopularButton).addEventListener("click", async () => {
                 const counts = await getPromptSubmissionCounts(currentPrompts);
                 const countMap = Object.fromEntries(counts.map(c => [c.id, c.count]));
 
@@ -395,7 +397,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             });
 
-            document.getElementById("sort-id-button").addEventListener("click", () => {
+            document.getElementById(SELECTORS.sortIdButton).addEventListener("click", () => {
                 const sorted = currentPrompts.slice().sort((a, b) => {
                     return sortIdAscending ? a.id.localeCompare(b.id) : b.id.localeCompare(a.id);
                 });
