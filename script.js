@@ -6,7 +6,7 @@ const CONFIG = {
     maxImageDimension: 100,
     defaultImageQuality: 0.5,
     submitEndpoint: "/.netlify/functions/submitImage",
-    randomRange: 10000,
+    positionVariance: 10000,
     seedOffsetX: 0,
     seedOffsetY: 2731,
     seedOffsetZ: 9649,
@@ -206,7 +206,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax))
 
             usernames.forEach((username, i) => {
                 const userSubs = grouped[username];
-                const randIndex = Math.floor(Math.sin(seed + i) * CONFIG.randomRange) % userSubs.length;
+                const randIndex = Math.floor(Math.sin(seed + i) * CONFIG.positionVariance) % userSubs.length;
                 const sub = userSubs[Math.abs(randIndex)];
 
                 const randX = Math.floor(Math.sin(seed + i + CONFIG.seedOffsetX) * (container.clientWidth - CONFIG.maxImageDimension)) % (container.clientWidth - CONFIG.maxImageDimension);
@@ -216,7 +216,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax))
                 wrapper.className = SELECTORS.submissionWrapper;
                 wrapper.style.left = `${Math.abs(randX)}px`;
                 wrapper.style.top = `${Math.abs(randY)}px`;
-                wrapper.style.zIndex = Math.abs(Math.floor(Math.sin(seed + i + CONFIG.seedOffsetZ) * CONFIG.randomRange)) % CONFIG.maxZIndex;
+                wrapper.style.zIndex = Math.abs(Math.floor(Math.sin(seed + i + CONFIG.seedOffsetZ) * CONFIG.positionVariance)) % CONFIG.maxZIndex;
 
                 const img = document.createElement("img");
                 img.src = sub.imageData;
