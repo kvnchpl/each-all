@@ -27,7 +27,8 @@ const SELECTORS = {
     aboutButton: "about-button",
     aboutModal: "about-modal",
     aboutClose: "about-close",
-    caption: "caption"
+    caption: "caption",
+    promptTile: "prompt-tile"
 }
 
 // ==== USERNAME MANAGEMENT ====
@@ -303,7 +304,7 @@ document.addEventListener("DOMContentLoaded", () => {
             grid.innerHTML = "";
             prompts.forEach((prompt) => {
                 const div = document.createElement("div");
-                div.className = "prompt-tile";
+                div.className = SELECTORS.promptTile;
                 div.textContent = prompt.id;
                 div.addEventListener("click", () => {
                     const seed = Math.floor(Math.random() * 1000000);
