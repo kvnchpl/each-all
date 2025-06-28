@@ -256,6 +256,40 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("about-close").addEventListener("click", () => {
         document.getElementById("about-modal").style.display = "none";
     });
+
+    // Tap-to-toggle captions on mobile (only one visible at a time, tap outside hides)
+    if (window.innerWidth <= 768) {
+        let currentlyVisibleCaption = null;
+
+        document.querySelectorAll(".submission-wrapper").forEach(wrapper => {
+            wrapper.addEventListener("click", (event) => {
+                event.stopPropagation(); // Prevent the global click from triggering
+                const caption = wrapper.querySelector(".caption");
+                if (!caption) return;
+
+                // Hide the currently visible caption if it's different
+                if (currentlyVisibleCaption && currentlyVisibleCaption !== caption) {
+                    currentlyVisibleCaption.style.visibility = "hidden";
+                    currentlyVisibleCaption.style.opacity = "0";
+                }
+
+                const isVisible = caption.style.visibility === "visible";
+                caption.style.visibility = isVisible ? "hidden" : "visible";
+                caption.style.opacity = isVisible ? "0" : "1";
+
+                currentlyVisibleCaption = isVisible ? null : caption;
+            });
+        });
+
+        // Hide caption if tapping anywhere else
+        document.addEventListener("click", () => {
+            if (currentlyVisibleCaption) {
+                currentlyVisibleCaption.style.visibility = "hidden";
+                currentlyVisibleCaption.style.opacity = "0";
+                currentlyVisibleCaption = null;
+            }
+        });
+    }
 });
 
 // ==== IMAGE PREVIEW HANDLER ====
