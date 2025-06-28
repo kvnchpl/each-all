@@ -200,8 +200,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
                 const img = document.createElement("img");
                 img.src = sub.imageData;
                 img.alt = sub.caption || "User submission";
-                const sizeScale = 0.8 + (Math.abs(Math.sin(seed + i + 500)) * 0.4); // Scale between 0.8 and 1.2
-                img.style.width = `${200 * sizeScale}px`;
+                img.style.width = "200px";
                 img.style.height = "auto";
 
                 const caption = document.createElement("div");
