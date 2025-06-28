@@ -19,7 +19,7 @@ function getUsername() {
 
 // ==== IMAGE RESIZING & COMPRESSION ====
 
-async function resizeAndCompressImage(file) {
+async function resizeAndCompressImage(file, quality = 0.5) {
     const maxDim = 200;
 
     const imageBitmap = await createImageBitmap(file);
@@ -40,7 +40,7 @@ async function resizeAndCompressImage(file) {
                 reader.readAsDataURL(blob);
             },
             "image/jpeg",
-            0.5
+            quality
         );
     });
 }
@@ -54,7 +54,11 @@ async function submitImage(promptId, fileInput, captionInput) {
         return;
     }
 
-    const imageData = await resizeAndCompressImage(file);
+    const urlParams = new URLSearchParams(window.location.search);
+    const qualityParam = parseFloat(urlParams.get("quality"));
+    const quality = !isNaN(qualityParam) && qualityParam >= 0 && qualityParam <= 1 ? qualityParam : 0.5;
+
+    const imageData = await resizeAndCompressImage(file, quality);
     const username = document.getElementById("username-input").value.trim() || getOrCreateUsername();
     const caption = captionInput.value;
 
