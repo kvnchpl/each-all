@@ -49,6 +49,7 @@ let sortIndicators = {};
 
 // ==== USERNAME MANAGEMENT ====
 
+// Generate a random username and save it if none exists
 function getOrCreateUsername() {
     let username = localStorage.getItem("eachAllUsername");
     if (!username) {
@@ -58,22 +59,26 @@ function getOrCreateUsername() {
     return username;
 }
 
+// Set the username in localStorage
 function setUsername(newUsername) {
     localStorage.setItem("eachAllUsername", newUsername);
 }
 
+// Retrieve the username from localStorage
 function getUsername() {
     return localStorage.getItem("eachAllUsername");
 }
 
 // ==== POPULARITY SORT HELPER ====
 
+// Fetch the submission counts for each prompt for popularity sorting
 async function getPromptSubmissionCounts(prompts) {
     const counts = await Promise.all(prompts.map(async (prompt) => {
         try {
             const res = await fetch(`${CONFIG.promptDataFolder}/${prompt.id}.json`);
             if (!res.ok) return { id: prompt.id, count: 0 };
             const data = await res.json();
+            // Count number of submissions if data is array
             return { id: prompt.id, count: Array.isArray(data) ? data.length : 0 };
         } catch {
             return { id: prompt.id, count: 0 };
@@ -84,17 +89,20 @@ async function getPromptSubmissionCounts(prompts) {
 
 // ==== IMAGE RESIZING & COMPRESSION ====
 
+// Resize and compress the uploaded image file, returning a DataURL
 async function resizeAndCompressImage(file, quality = CONFIG.defaultImageQuality, maxDim = CONFIG.maxImageDimension) {
     const imageBitmap = await createImageBitmap(file);
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
+    // Calculate scale to fit within maxDim
     const scale = Math.min(maxDim / imageBitmap.width, maxDim / imageBitmap.height, 1);
     canvas.width = imageBitmap.width * scale;
     canvas.height = imageBitmap.height * scale;
 
     ctx.drawImage(imageBitmap, 0, 0, canvas.width, canvas.height);
 
+    // Convert canvas to DataURL asynchronously
     return new Promise((resolve) => {
         canvas.toBlob(
             (blob) => {
@@ -110,18 +118,21 @@ async function resizeAndCompressImage(file, quality = CONFIG.defaultImageQuality
 
 // ==== FORM SUBMISSION HANDLER ====
 
+// Handle image form submission: validate, compress, and send to backend
 async function submitImage(promptId, fileInput, captionInput) {
     const file = fileInput.files[0];
     if (!file) {
         alert("oops! you need to choose an image file before submitting.");
         return;
     }
+    // Validate file type
     const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
     if (!allowedTypes.includes(file.type)) {
         alert("that file format isn’t supported. try uploading a jpg, png, or webp image.");
         return;
     }
 
+    // Parse optional quality and dimension params from URL
     const urlParams = new URLSearchParams(window.location.search);
     const qualityParam = parseFloat(urlParams.get("quality"));
     const quality = !isNaN(qualityParam) && qualityParam >= 0 && qualityParam <= 1 ? qualityParam : CONFIG.defaultImageQuality;
@@ -129,6 +140,7 @@ async function submitImage(promptId, fileInput, captionInput) {
     const maxDimParam = parseInt(urlParams.get("maxDim"));
     const maxDim = !isNaN(maxDimParam) && maxDimParam > 0 ? maxDimParam : CONFIG.maxImageDimension;
 
+    // Resize and compress image
     const imageData = await resizeAndCompressImage(file, quality, maxDim);
     const username = document.getElementById(SELECTORS.usernameInput).value.trim();
     if (!username) {
@@ -137,6 +149,7 @@ async function submitImage(promptId, fileInput, captionInput) {
     }
     const caption = captionInput.value;
 
+    // Prepare payload for submission
     const payload = {
         username,
         promptId,
@@ -156,6 +169,7 @@ async function submitImage(promptId, fileInput, captionInput) {
         const result = await res.json();
         if (result.success) {
             alert("thanks for sharing! your image has been submitted. check back in a minute or so to see it live.");
+            // Reset form after successful submission
             fileInput.value = "";
             captionInput.value = "";
             document.getElementById(SELECTORS.filenamePreview).textContent = "";
@@ -170,6 +184,7 @@ async function submitImage(promptId, fileInput, captionInput) {
     }
 }
 
+// Wrapper for form submission event
 function handleSubmit() {
     const form = document.getElementById(SELECTORS.submissionForm);
     const fileInput = form.elements[SELECTORS.imageInput];
@@ -179,8 +194,10 @@ function handleSubmit() {
 
 // ==== PROMPT MODAL HANDLING ====
 
+// Open the submission modal for a prompt and display its submissions
 function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax)) {
     currentPromptId = promptId;
+    // Fetch and display prompt text
     fetch(CONFIG.promptsListPath)
         .then(res => res.json())
         .then(prompts => {
@@ -195,6 +212,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax))
 
     const container = document.getElementById(SELECTORS.submissionsContainer);
 
+    // Fetch and display submissions for the prompt
     fetch(`${CONFIG.promptDataFolder}/${promptId}.json`)
         .then(res => {
             if (!res.ok) {
@@ -222,9 +240,11 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax))
 
             usernames.forEach((username, i) => {
                 const userSubs = grouped[username];
+                // Deterministically select a submission per user
                 const randIndex = Math.floor(Math.sin(seed + i) * CONFIG.positionVariance) % userSubs.length;
                 const sub = userSubs[Math.abs(randIndex)];
 
+                // Randomize position for each submission
                 const randX = Math.floor(Math.sin(seed + i + CONFIG.seedOffsetX) * (container.clientWidth - CONFIG.maxImageDimension)) % (container.clientWidth - CONFIG.maxImageDimension);
                 const randY = Math.floor(Math.sin(seed + i + CONFIG.seedOffsetY) * (container.clientHeight - CONFIG.maxImageDimension)) % (container.clientHeight - CONFIG.maxImageDimension);
 
@@ -256,7 +276,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax))
                 wrapper.appendChild(caption);
                 container.appendChild(wrapper);
 
-                // Make wrapper draggable
+                // Make wrapper draggable (mouse)
                 let offsetX, offsetY;
 
                 wrapper.addEventListener("mousedown", (e) => {
@@ -277,6 +297,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax))
                     document.addEventListener("mouseup", onMouseUp);
                 });
 
+                // Make wrapper draggable (touch)
                 wrapper.addEventListener("touchstart", (e) => {
                     const touch = e.touches[0];
                     offsetX = touch.clientX - wrapper.offsetLeft;
@@ -303,6 +324,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax))
         });
 }
 
+// Close the submission modal and reset form state
 function closeModal() {
     document.getElementById(SELECTORS.submissionModal).classList.remove("visible");
     const url = new URL(window.location);
@@ -313,6 +335,7 @@ function closeModal() {
     document.getElementById(SELECTORS.filenamePreview).textContent = "";
 }
 
+// Toggle the modal header between minimized and expanded
 function handleToggleHeader(e) {
     e.preventDefault();
     const header = document.getElementById(SELECTORS.modalHeader);
@@ -323,7 +346,7 @@ function handleToggleHeader(e) {
 
 // ==== PROMPT GRID INITIALIZATION ====
 
-// Render prompt tiles
+// Render prompt tiles in the grid
 function renderPromptTiles(promptArray) {
     const grid = document.getElementById(SELECTORS.promptGrid);
     grid.innerHTML = "";
@@ -331,6 +354,7 @@ function renderPromptTiles(promptArray) {
         const div = document.createElement("div");
         div.className = SELECTORS.promptTile;
         div.textContent = prompt.id;
+        // Clicking a tile opens the prompt modal for that prompt
         div.addEventListener("click", () => {
             const seed = Math.floor(Math.random() * CONFIG.seedMax);
             const url = new URL(window.location);
@@ -343,6 +367,7 @@ function renderPromptTiles(promptArray) {
     });
 }
 
+// Sort prompts by popularity and re-render tiles
 async function handleSortByPopularity() {
     const counts = await getPromptSubmissionCounts(currentPrompts);
     const countMap = Object.fromEntries(counts.map(c => [c.id, c.count]));
@@ -355,6 +380,7 @@ async function handleSortByPopularity() {
     renderPromptTiles(sorted);
 }
 
+// Sort prompts by ID and re-render tiles
 function handleSortById() {
     const sorted = currentPrompts.slice().sort((a, b) => {
         return sortIdAscending ? a.id.localeCompare(b.id) : b.id.localeCompare(a.id);
@@ -364,6 +390,7 @@ function handleSortById() {
     renderPromptTiles(sorted);
 }
 
+// Randomize the seed for current prompt and reload modal
 function handleRandomizeSeed() {
     const url = new URL(window.location);
     const currentPrompt = url.searchParams.get("prompt");
@@ -375,6 +402,7 @@ function handleRandomizeSeed() {
     }
 }
 
+// Update sort indicator arrows on sort buttons
 function updateSortIndicators(activeKey, direction) {
     Object.keys(sortIndicators).forEach(key => {
         const btn = sortIndicators[key];
@@ -389,15 +417,17 @@ function updateSortIndicators(activeKey, direction) {
 
 // ==== INITIALIZATION ON PAGE LOAD ====
 
+// Main page initialization logic on DOMContentLoaded
 document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
     const promptId = urlParams.get("prompt");
     const seed = urlParams.get("seed");
     if (promptId) {
+        // Open prompt modal if prompt param is present
         openPrompt(promptId, seed ? parseInt(seed) : undefined);
     }
 
-    // Load prompt data
+    // Load prompt data and initialize grid
     fetch(CONFIG.promptsListPath)
         .then((res) => res.json())
         .then((prompts) => {
@@ -409,7 +439,7 @@ document.addEventListener("DOMContentLoaded", () => {
             };
         });
 
-    // Prefill username input and add listener
+    // Prefill username input and save changes
     const usernameInput = document.getElementById(SELECTORS.usernameInput);
     const savedUsername = getUsername() || getOrCreateUsername();
     usernameInput.value = savedUsername;
@@ -417,7 +447,7 @@ document.addEventListener("DOMContentLoaded", () => {
         setUsername(usernameInput.value);
     });
 
-    // Add event listeners for buttons
+    // Add event listeners for form and UI buttons
     document.getElementById(SELECTORS.submissionForm).addEventListener("submit", (e) => {
         e.preventDefault();
         handleSubmit();
@@ -435,7 +465,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById(SELECTORS.aboutModal).classList.remove("visible");
     });
 
-    // Tap-to-toggle captions on mobile (only one visible at a time, tap outside hides)
+    // Tap-to-toggle captions on mobile: only one visible at a time, tap outside hides
     if (window.innerWidth <= 768) {
         let currentlyVisibleCaption = null;
         document.querySelectorAll("." + SELECTORS.submissionWrapper).forEach(wrapper => {
@@ -467,6 +497,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ==== FILENAME PREVIEW HANDLER ====
 
+// Show filename preview when a file is selected in the image input
 document.getElementById(SELECTORS.imageInput).addEventListener("change", (event) => {
     const file = event.target.files[0];
     const previewContainer = document.getElementById(SELECTORS.filenamePreview);
