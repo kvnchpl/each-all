@@ -200,6 +200,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
                 wrapper.className = SELECTORS.submissionWrapper;
                 wrapper.style.left = `${Math.abs(randX)}px`;
                 wrapper.style.top = `${Math.abs(randY)}px`;
+                wrapper.style.zIndex = Math.abs(Math.floor(Math.sin(seed + i + 5000) * 10000)) % 100;
 
                 const img = document.createElement("img");
                 img.src = sub.imageData;
