@@ -196,11 +196,6 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
 
             container.innerHTML = "";
 
-            function seededRandom(seed) {
-                var x = Math.sin(seed++) * 10000;
-                return x - Math.floor(x);
-            }
-
             // Group submissions by username
             const grouped = {};
             submissions.forEach((sub) => {
@@ -349,7 +344,6 @@ document.addEventListener("DOMContentLoaded", () => {
             let sortIdAscending = true;
 
             // Sort indicator state ===
-            let activeSortButton = null;
             let sortIndicators = {
                 popular: document.getElementById(SELECTORS.sortPopularButton),
                 id: document.getElementById(SELECTORS.sortIdButton)
