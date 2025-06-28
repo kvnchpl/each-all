@@ -293,7 +293,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const isMinimized = header.classList.toggle("minimized");
 
         const toggleBtn = document.getElementById(SELECTORS.toggleHeader);
-        toggleBtn.textContent = isMinimized ? "+" : "–";
+        toggleBtn.textContent = isMinimized ? "&#8595;" : "&#8593;";
     });
 
     document.getElementById(SELECTORS.returnButton).addEventListener("click", closeModal);
