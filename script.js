@@ -3,7 +3,7 @@
 const CONFIG = {
     promptsListPath: "prompts.json",
     promptDataFolder: "prompts",
-    maxImageDimension: 200,
+    maxImageDimension: 100,
     defaultImageQuality: 0.5,
     submitEndpoint: "/.netlify/functions/submitImage"
 };
@@ -200,8 +200,6 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
                 const img = document.createElement("img");
                 img.src = sub.imageData;
                 img.alt = sub.caption || "User submission";
-                img.style.width = "200px";
-                img.style.height = "auto";
 
                 const caption = document.createElement("div");
                 caption.className = SELECTORS.caption;
