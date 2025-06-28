@@ -85,6 +85,7 @@ async function submitImage(promptId, fileInput, captionInput) {
             fileInput.value = "";
             captionInput.value = "";
             document.getElementById("filename-preview").textContent = "";
+            const form = document.getElementById("submission-form");
             form.reset();
         } else {
             alert("Submission failed. " + (result.error || "Unknown error"));
