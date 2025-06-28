@@ -76,12 +76,22 @@ async function getPromptSubmissionCounts(prompts) {
     const counts = await Promise.all(prompts.map(async (prompt) => {
         try {
             const res = await fetch(`${CONFIG.promptDataFolder}/${prompt.id}.json`);
-            if (!res.ok) return { id: prompt.id, count: 0 };
+            if (!res.ok) return {
+                id: prompt.id,
+                count: 0
+            };
             const data = await res.json();
+            
             // Count number of submissions if data is array
-            return { id: prompt.id, count: Array.isArray(data) ? data.length : 0 };
+            return {
+                id: prompt.id,
+                count: Array.isArray(data) ? data.length : 0
+            };
         } catch {
-            return { id: prompt.id, count: 0 };
+            return {
+                id: prompt.id,
+                count: 0
+            };
         }
     }));
     return counts;
