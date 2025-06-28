@@ -68,6 +68,11 @@ async function submitImage(promptId, fileInput, captionInput) {
         alert("Please select an image file.");
         return;
     }
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+        alert("Unsupported image format. Please upload a JPG, PNG, or WebP.");
+        return;
+    }
 
     const urlParams = new URLSearchParams(window.location.search);
     const qualityParam = parseFloat(urlParams.get("quality"));
