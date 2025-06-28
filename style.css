@@ -241,6 +241,7 @@ h1 {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease;
+    padding: 0;
 }
 
 #toggle-header {
@@ -249,10 +250,11 @@ h1 {
 
 @media (max-width: 768px) {
     .modal-content {
-        width: 90vw;
+        width: 100vw;
         max-width: none;
         height: auto;
         flex-direction: column;
+        gap: 0;
     }
 
     #modal-header {
@@ -281,7 +283,7 @@ h1 {
         display: block;
         position: relative;
         z-index: 1001;
-        width: 100%;
+        width: 100vw;
         padding: var(--padding-small);
         background-color: var(--bg-color-dark);
         color: var(--text-color-light);
