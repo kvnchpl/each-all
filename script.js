@@ -125,6 +125,7 @@ async function submitImage(promptId, fileInput, captionInput) {
         alert("oops! you need to choose an image file before submitting.");
         return;
     }
+
     // Validate file type
     const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
     if (!allowedTypes.includes(file.type)) {
@@ -169,6 +170,7 @@ async function submitImage(promptId, fileInput, captionInput) {
         const result = await res.json();
         if (result.success) {
             alert("thanks for sharing! your image has been submitted. check back in a minute or so to see it live.");
+
             // Reset form after successful submission
             fileInput.value = "";
             captionInput.value = "";
@@ -197,6 +199,7 @@ function handleSubmit() {
 // Open the submission modal for a prompt and display its submissions
 function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax)) {
     currentPromptId = promptId;
+
     // Fetch and display prompt text
     fetch(CONFIG.promptsListPath)
         .then(res => res.json())
@@ -240,6 +243,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax))
 
             usernames.forEach((username, i) => {
                 const userSubs = grouped[username];
+
                 // Deterministically select a submission per user
                 const randIndex = Math.floor(Math.sin(seed + i) * CONFIG.positionVariance) % userSubs.length;
                 const sub = userSubs[Math.abs(randIndex)];
@@ -354,6 +358,7 @@ function renderPromptTiles(promptArray) {
         const div = document.createElement("div");
         div.className = SELECTORS.promptTile;
         div.textContent = prompt.id;
+
         // Clicking a tile opens the prompt modal for that prompt
         div.addEventListener("click", () => {
             const seed = Math.floor(Math.random() * CONFIG.seedMax);
@@ -473,6 +478,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 event.stopPropagation(); // Prevent the global click from triggering
                 const caption = wrapper.querySelector("." + SELECTORS.caption);
                 if (!caption) return;
+
                 // Hide the currently visible caption if it's different
                 if (currentlyVisibleCaption && currentlyVisibleCaption !== caption) {
                     currentlyVisibleCaption.classList.remove("caption-visible");
@@ -484,6 +490,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 currentlyVisibleCaption = isVisible ? null : caption;
             });
         });
+
         // Hide caption if tapping anywhere else
         document.addEventListener("click", () => {
             if (currentlyVisibleCaption) {
