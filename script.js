@@ -374,13 +374,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // Hide the currently visible caption if it's different
                 if (currentlyVisibleCaption && currentlyVisibleCaption !== caption) {
-                    currentlyVisibleCaption.style.visibility = "hidden";
-                    currentlyVisibleCaption.style.opacity = "0";
+                    currentlyVisibleCaption.classList.remove("caption-visible");
+                    currentlyVisibleCaption.classList.add("caption-hidden");
                 }
 
-                const isVisible = caption.style.visibility === "visible";
-                caption.style.visibility = isVisible ? "hidden" : "visible";
-                caption.style.opacity = isVisible ? "0" : "1";
+                const isVisible = caption.classList.contains("caption-visible");
+                caption.classList.toggle("caption-visible", !isVisible);
+                caption.classList.toggle("caption-hidden", isVisible);
 
                 currentlyVisibleCaption = isVisible ? null : caption;
             });
@@ -389,8 +389,8 @@ document.addEventListener("DOMContentLoaded", () => {
         // Hide caption if tapping anywhere else
         document.addEventListener("click", () => {
             if (currentlyVisibleCaption) {
-                currentlyVisibleCaption.style.visibility = "hidden";
-                currentlyVisibleCaption.style.opacity = "0";
+                currentlyVisibleCaption.classList.remove("caption-visible");
+                currentlyVisibleCaption.classList.add("caption-hidden");
                 currentlyVisibleCaption = null;
             }
         });
