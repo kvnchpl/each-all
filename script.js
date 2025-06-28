@@ -342,16 +342,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Store original order for sorting
             let currentPrompts = prompts.slice();
+            // Add sort direction trackers
+            let sortPopularDescending = true;
+            let sortIdAscending = true;
+
+            // Sort indicator state ===
+            let activeSortButton = null;
+            let sortIndicators = {
+                popular: document.getElementById("sort-popular-button"),
+                id: document.getElementById("sort-id-button")
+            };
+
+            function updateSortIndicators(activeKey, direction) {
+                Object.keys(sortIndicators).forEach(key => {
+                    const btn = sortIndicators[key];
+                    if (key === activeKey) {
+                        btn.textContent = key === "popular" ? "Sort by Popularity" : "Sort by ID";
+                        btn.textContent += direction ? " ↓" : " ↑";
+                    } else {
+                        btn.textContent = key === "popular" ? "Sort by Popularity" : "Sort by ID";
+                    }
+                });
+            }
 
             document.getElementById("sort-popular-button").addEventListener("click", async () => {
                 const counts = await getPromptSubmissionCounts(currentPrompts);
                 const countMap = Object.fromEntries(counts.map(c => [c.id, c.count]));
 
                 const sorted = currentPrompts.slice().sort((a, b) => {
-                    const countDiff = (countMap[b.id] || 0) - (countMap[a.id] || 0);
-                    if (countDiff !== 0) return countDiff;
-                    return a.id.localeCompare(b.id);
+                    const diff = (countMap[b.id] || 0) - (countMap[a.id] || 0);
+                    return sortPopularDescending ? diff : -diff;
                 });
+
+                sortPopularDescending = !sortPopularDescending;
+                updateSortIndicators("popular", sortPopularDescending);
 
                 const grid = document.getElementById(SELECTORS.promptGrid);
                 grid.innerHTML = "";
@@ -371,9 +395,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             });
 
-            // Add Sort by ID button event listener
             document.getElementById("sort-id-button").addEventListener("click", () => {
-                const sorted = currentPrompts.slice().sort((a, b) => a.id.localeCompare(b.id));
+                const sorted = currentPrompts.slice().sort((a, b) => {
+                    return sortIdAscending ? a.id.localeCompare(b.id) : b.id.localeCompare(a.id);
+                });
+
+                sortIdAscending = !sortIdAscending;
+                updateSortIndicators("id", sortIdAscending);
 
                 const grid = document.getElementById(SELECTORS.promptGrid);
                 grid.innerHTML = "";
