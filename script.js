@@ -40,7 +40,7 @@ async function resizeAndCompressImage(file) {
                 reader.readAsDataURL(blob);
             },
             "image/jpeg",
-            0.7 // compression quality (can be tuned)
+            0.5
         );
     });
 }
@@ -161,6 +161,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
                 const caption = document.createElement("div");
                 caption.className = "caption";
                 caption.textContent = sub.caption ? `${sub.username}: ${sub.caption}` : sub.username;
+
                 // Set caption alignment and position based on image position
                 const containerMidpoint = container.clientWidth / 2;
                 const wrapperX = Math.abs(randX);
