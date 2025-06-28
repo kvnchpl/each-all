@@ -99,7 +99,7 @@ exports.handler = async (event) => {
                 subject: `EACH ALL: New submission to Prompt ${promptId}`,
                 html: `
               <p><strong>${username}</strong> submitted an image to prompt <strong>${promptId}</strong>.</p>
-              ${caption ? `<p><Caption: ${caption}</p>` : ""}
+              ${caption ? `<p>Caption: ${caption}</p>` : ""}
               <p>Submitted at: ${submittedAt}</p>
             `,
             });
