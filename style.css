@@ -32,7 +32,7 @@ body {
     color: var(--text-color-dark);
     font-family: var(--font-family);
     margin: 0;
-    padding: var(--padding-base);
+    padding: 0;
     text-align: center;
     text-transform: lowercase;
     -webkit-font-smoothing: antialiased;
@@ -79,7 +79,6 @@ h1 {
     background-color: var(--bg-color-light);
     color: var(--text-color-dark);
     z-index: 1000;
-    padding: var(--padding-base);
 }
 
 /* Modal Layout */
@@ -98,7 +97,6 @@ h1 {
     height: 100%;
     width: 15vw;
     max-width: 15vw;
-    padding: var(--padding-base);
     background-color: var(--bg-color-dark);
 }
 
@@ -212,13 +210,11 @@ h1 {
     z-index: 1001;
     justify-content: center;
     align-items: center;
-    padding: var(--padding-large);
 }
 
 #about-content {
     background-color: var(--bg-color-dark);
     color: var(--text-color-light);
-    padding: var(--padding-large);
     max-width: 50vw;
     margin: 0 auto;
 }
@@ -260,6 +256,5 @@ h1 {
     #submission-modal {
         flex-direction: column;
         overflow-y: auto;
-        padding: var(--padding-small);
     }
 }
