@@ -262,4 +262,8 @@ h1 {
         overflow-y: auto;
         padding: var(--padding-small);
     }
+
+    .flex-col {
+        margin-bottom: 0;
+    }
 }
