@@ -1,9 +1,14 @@
+// Netlify function to handle image submissions to a GitHub repo.
+// Parses POST request, validates fields, updates GitHub file, and sends notification email.
+
+// Dynamically import Octokit (GitHub API client)
 let Octokit;
 (async () => {
     const mod = await import("@octokit/rest");
     Octokit = mod.Octokit;
 })();
 
+// Netlify Lambda handler function
 exports.handler = async (event) => {
     while (!Octokit) {
         await new Promise((res) => setTimeout(res, 10));
@@ -15,12 +20,14 @@ exports.handler = async (event) => {
 
     console.log("Incoming event:", event);
 
+    // Only allow POST requests
     if (event.httpMethod !== "POST") {
         return { statusCode: 405, body: "Method Not Allowed" };
     }
 
     const headers = event.headers;
 
+    // Parse request body
     let body;
     try {
         body = JSON.parse(event.body || "{}");
@@ -29,6 +36,7 @@ exports.handler = async (event) => {
         return { statusCode: 400, body: "Malformed JSON body." };
     }
 
+    // Validate environment variables
     if (!GITHUB_TOKEN || !GITHUB_USER || !REPO_NAME) {
         return {
             statusCode: 500,
@@ -36,18 +44,21 @@ exports.handler = async (event) => {
         };
     }
 
+    // Extract submission data from request
     const { username, promptId, caption, imageData } = body;
 
     if (!username || !promptId || !imageData) {
         return { statusCode: 400, body: "Missing required fields" };
     }
 
+    // Initialize Octokit with authentication
     const octokit = new Octokit({ auth: GITHUB_TOKEN });
     const filePath = `prompts/${promptId}.json`;
 
     let submissions = [];
     let sha = undefined;
 
+    // Try to load existing submissions file from GitHub
     try {
         const { data: existingFile } = await octokit.repos.getContent({
             owner: GITHUB_USER,
@@ -72,6 +83,7 @@ exports.handler = async (event) => {
     }
 
     try {
+        // Create new submission object
         const newSubmission = {
             username,
             caption: caption || "",
@@ -79,7 +91,7 @@ exports.handler = async (event) => {
             imageData,
         };
 
-        // Send notification email via Resend
+        // Send a notification email about the new submission
         try {
             const { Resend } = await import('resend');
             const resend = new Resend(process.env.RESEND_API_KEY);
@@ -104,12 +116,15 @@ exports.handler = async (event) => {
             console.error("Failed to send notification email:", emailError);
         }
 
+        // Add new submission to the array
         submissions.push(newSubmission);
 
+        // Encode updated submissions to base64 and prepare commit
         const updatedContent = Buffer.from(JSON.stringify(submissions, null, 2)).toString("base64");
 
         const commitMessage = `Add submission by ${username} to prompt ${promptId}`;
 
+        // Commit updated file to GitHub
         await octokit.repos.createOrUpdateFileContents({
             owner: GITHUB_USER,
             repo: REPO_NAME,
