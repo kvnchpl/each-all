@@ -7,9 +7,10 @@ const CONFIG = {
     defaultImageQuality: 0.5,
     submitEndpoint: "/.netlify/functions/submitImage",
     randomRange: 10000,
+    seedOffsetX: 0,
     seedOffsetY: 1000,
     seedOffsetZ: 5000,
-    maxZIndex: 100,
+    maxZIndex: 100
 };
 
 const SELECTORS = {
@@ -197,7 +198,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
                 const randIndex = Math.floor(Math.sin(seed + i) * CONFIG.randomRange) % userSubs.length;
                 const sub = userSubs[Math.abs(randIndex)];
 
-                const randX = Math.floor(Math.sin(seed + i) * (container.clientWidth - CONFIG.maxImageDimension)) % (container.clientWidth - CONFIG.maxImageDimension);
+                const randX = Math.floor(Math.sin(seed + i + CONFIG.seedOffsetX) * (container.clientWidth - CONFIG.maxImageDimension)) % (container.clientWidth - CONFIG.maxImageDimension);
                 const randY = Math.floor(Math.sin(seed + i + CONFIG.seedOffsetY) * (container.clientHeight - CONFIG.maxImageDimension)) % (container.clientHeight - CONFIG.maxImageDimension);
 
                 const wrapper = document.createElement("div");
