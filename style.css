@@ -43,6 +43,10 @@ h1 {
     margin-bottom: var(--padding-base);
 }
 
+button {
+    text-transform: none;
+}
+
 /* Sort Controls */
 #sort-controls {
     display: grid;
