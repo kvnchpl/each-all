@@ -1,4 +1,4 @@
-// === CONFIGURATION VARIABLES ====
+/* CONFIGURATION VARIABLES */
 
 const CONFIG = {
     promptsListPath: "prompts.json",
@@ -39,7 +39,7 @@ const SELECTORS = {
     sortIdButton: "sort-id-button"
 }
 
-// ==== STATE VARIABLES ====
+/* STATE VARIABLES */
 
 let currentPromptId = "";
 let currentPrompts = [];
@@ -47,7 +47,7 @@ let sortPopularDescending = true;
 let sortIdAscending = true;
 let sortIndicators = {};
 
-// ==== USERNAME MANAGEMENT ====
+/* USERNAME MANAGEMENT */
 
 // Generate a random username and save it if none exists
 function getOrCreateUsername() {
@@ -69,7 +69,7 @@ function getUsername() {
     return localStorage.getItem("eachAllUsername");
 }
 
-// ==== POPULARITY SORT HELPER ====
+/* POPULARITY SORT HELPER */
 
 // Fetch the submission counts for each prompt for popularity sorting
 async function getPromptSubmissionCounts(prompts) {
@@ -81,7 +81,7 @@ async function getPromptSubmissionCounts(prompts) {
                 count: 0
             };
             const data = await res.json();
-            
+
             // Count number of submissions if data is array
             return {
                 id: prompt.id,
@@ -97,7 +97,7 @@ async function getPromptSubmissionCounts(prompts) {
     return counts;
 }
 
-// ==== IMAGE RESIZING & COMPRESSION ====
+/* IMAGE RESIZING & COMPRESSION */
 
 // Resize and compress the uploaded image file, returning a DataURL
 async function resizeAndCompressImage(file, quality = CONFIG.defaultImageQuality, maxDim = CONFIG.maxImageDimension) {
@@ -126,7 +126,7 @@ async function resizeAndCompressImage(file, quality = CONFIG.defaultImageQuality
     });
 }
 
-// ==== FORM SUBMISSION HANDLER ====
+/* FORM SUBMISSION HANDLER */
 
 // Handle image form submission: validate, compress, and send to backend
 async function submitImage(promptId, fileInput, captionInput) {
@@ -204,7 +204,7 @@ function handleSubmit() {
     submitImage(currentPromptId, fileInput, captionInput);
 }
 
-// ==== PROMPT MODAL HANDLING ====
+/* PROMPT MODAL HANDLING */
 
 // Open the submission modal for a prompt and display its submissions
 function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax)) {
@@ -358,7 +358,7 @@ function handleToggleHeader(e) {
     toggleBtn.textContent = isMinimized ? "↓" : "↑";
 }
 
-// ==== PROMPT GRID INITIALIZATION ====
+/* PROMPT GRID INITIALIZATION */
 
 // Render prompt tiles in the grid
 function renderPromptTiles(promptArray) {
@@ -430,7 +430,7 @@ function updateSortIndicators(activeKey, direction) {
     });
 }
 
-// ==== INITIALIZATION ON PAGE LOAD ====
+/* INITIALIZATION ON PAGE LOAD */
 
 // Main page initialization logic on DOMContentLoaded
 document.addEventListener("DOMContentLoaded", () => {
@@ -512,7 +512,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// ==== FILENAME PREVIEW HANDLER ====
+/* FILENAME PREVIEW HANDLER */
 
 // Show filename preview when a file is selected in the image input
 document.getElementById(SELECTORS.imageInput).addEventListener("change", (event) => {
