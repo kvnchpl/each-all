@@ -343,7 +343,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // Store original order for sorting
             let currentPrompts = prompts.slice();
 
-            document.getElementById("sort-button").addEventListener("click", async () => {
+            document.getElementById("sort-popular-button").addEventListener("click", async () => {
                 const counts = await getPromptSubmissionCounts(currentPrompts);
                 const countMap = Object.fromEntries(counts.map(c => [c.id, c.count]));
 

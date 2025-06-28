@@ -53,10 +53,6 @@ h1 {
     margin-bottom: var(--padding-base);
 }
 
-#sort-controls .prompt-tile {
-    text-align: center;
-}
-
 /* Prompt Grid (Homepage) */
 #prompt-grid {
     display: grid;
@@ -69,7 +65,8 @@ h1 {
     z-index: 1;
 }
 
-.prompt-tile {
+.prompt-tile,
+.control-button {
     color: var(--highlight-color);
     padding: var(--padding-small) var(--padding-base);
     font-family: inherit;
@@ -78,7 +75,8 @@ h1 {
     cursor: pointer;
 }
 
-.prompt-tile:hover {
+.prompt-tile:hover,
+.control-button:hover {
     font-weight: bold;
 }
 
