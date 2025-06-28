@@ -82,6 +82,25 @@ exports.handler = async (event) => {
 
         submissions.push(newSubmission);
 
+        // Send notification email via Resend
+        try {
+            const { Resend } = await import('resend');
+            const resend = new Resend(process.env.RESEND_API_KEY);
+
+            await resend.emails.send({
+                from: process.env.FROM_EMAIL || 'no-reply@resend.dev',
+                to: process.env.NOTIFY_EMAIL,
+                subject: `📸 New submission to Prompt ${promptId}`,
+                html: `
+              <p><strong>${username}</strong> submitted an image to prompt <strong>${promptId}</strong>.</p>
+              ${caption ? `<p><em>Caption:</em> ${caption}</p>` : ""}
+              <p>Submitted at: ${new Date().toLocaleString()}</p>
+            `,
+            });
+        } catch (emailError) {
+            console.error("Failed to send notification email:", emailError);
+        }
+
         const updatedContent = Buffer.from(JSON.stringify(submissions, null, 2)).toString("base64");
 
         const commitMessage = `Add submission by ${username} to prompt ${promptId}`;
