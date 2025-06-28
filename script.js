@@ -5,7 +5,11 @@ const CONFIG = {
     promptDataFolder: "prompts",
     maxImageDimension: 100,
     defaultImageQuality: 0.5,
-    submitEndpoint: "/.netlify/functions/submitImage"
+    submitEndpoint: "/.netlify/functions/submitImage",
+    randomRange: 10000,
+    seedOffsetY: 1000,
+    seedOffsetZ: 5000,
+    maxZIndex: 100,
 };
 
 const SELECTORS = {
@@ -190,17 +194,17 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
 
             usernames.forEach((username, i) => {
                 const userSubs = grouped[username];
-                const randIndex = Math.floor(Math.sin(seed + i) * 10000) % userSubs.length;
+                const randIndex = Math.floor(Math.sin(seed + i) * CONFIG.randomRange) % userSubs.length;
                 const sub = userSubs[Math.abs(randIndex)];
 
-                const randX = Math.floor(Math.sin(seed + i) * (container.clientWidth - 100)) % (container.clientWidth - 100);
-                const randY = Math.floor(Math.sin(seed + i + 1000) * (container.clientHeight - 100)) % (container.clientHeight - 100);
+                const randX = Math.floor(Math.sin(seed + i) * (container.clientWidth - CONFIG.maxImageDimension)) % (container.clientWidth - CONFIG.maxImageDimension);
+                const randY = Math.floor(Math.sin(seed + i + CONFIG.seedOffsetY) * (container.clientHeight - CONFIG.maxImageDimension)) % (container.clientHeight - CONFIG.maxImageDimension);
 
                 const wrapper = document.createElement("div");
                 wrapper.className = SELECTORS.submissionWrapper;
                 wrapper.style.left = `${Math.abs(randX)}px`;
                 wrapper.style.top = `${Math.abs(randY)}px`;
-                wrapper.style.zIndex = Math.abs(Math.floor(Math.sin(seed + i + 5000) * 10000)) % 100;
+                wrapper.style.zIndex = Math.abs(Math.floor(Math.sin(seed + i + CONFIG.seedOffsetZ) * CONFIG.randomRange)) % CONFIG.maxZIndex;
 
                 const img = document.createElement("img");
                 img.src = sub.imageData;
