@@ -260,7 +260,9 @@ h1 {
     #modal-header {
         width: 100%;
         max-width: none;
-        max-height: 40vh;
+        max-height: 50vh;
+        box-sizing: border-box;
+        overflow-x: hidden;
     }
 
     #submissions-container {
