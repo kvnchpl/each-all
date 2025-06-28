@@ -8,8 +8,8 @@ const CONFIG = {
     submitEndpoint: "/.netlify/functions/submitImage",
     randomRange: 10000,
     seedOffsetX: 0,
-    seedOffsetY: 1000,
-    seedOffsetZ: 5000,
+    seedOffsetY: 2731,
+    seedOffsetZ: 9649,
     maxZIndex: 100
 };
 
