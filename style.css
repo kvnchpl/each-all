@@ -231,6 +231,18 @@ h1 {
         width: 90vw;
         max-width: none;
         height: auto;
+        flex-direction: column;
+    }
+
+    #modal-header {
+        width: 100%;
+        max-width: none;
+    }
+
+    #submissions-container {
+        width: 100%;
+        height: auto;
+        position: relative;
     }
 
     #submission-modal {
