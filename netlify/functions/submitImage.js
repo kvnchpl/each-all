@@ -9,25 +9,17 @@ exports.handler = async (event) => {
         await new Promise((res) => setTimeout(res, 10));
     }
 
+    const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+    const GITHUB_USER = process.env.GITHUB_USER;
+    const REPO_NAME = process.env.REPO_NAME;
+
     console.log("Incoming event:", event);
 
     if (event.httpMethod !== "POST") {
         return { statusCode: 405, body: "Method Not Allowed" };
     }
 
-    const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-    const GITHUB_USER = process.env.GITHUB_USER;
-    const REPO_NAME = process.env.REPO_NAME;
-
-    if (!GITHUB_TOKEN || !GITHUB_USER || !REPO_NAME) {
-        return {
-            statusCode: 500,
-            body: "Server misconfiguration: missing environment variables.",
-        };
-    }
-
     const headers = event.headers;
-    console.log("Headers:", headers);
 
     let body;
     try {
@@ -35,6 +27,13 @@ exports.handler = async (event) => {
     } catch (e) {
         console.error("JSON parse error:", e);
         return { statusCode: 400, body: "Malformed JSON body." };
+    }
+
+    if (!GITHUB_TOKEN || !GITHUB_USER || !REPO_NAME) {
+        return {
+            statusCode: 500,
+            body: "Server misconfiguration: missing environment variables.",
+        };
     }
 
     const { username, promptId, caption, imageData } = body;
@@ -80,8 +79,6 @@ exports.handler = async (event) => {
             imageData,
         };
 
-        submissions.push(newSubmission);
-
         // Send notification email via Resend
         try {
             const { Resend } = await import('resend');
@@ -106,6 +103,8 @@ exports.handler = async (event) => {
         } catch (emailError) {
             console.error("Failed to send notification email:", emailError);
         }
+
+        submissions.push(newSubmission);
 
         const updatedContent = Buffer.from(JSON.stringify(submissions, null, 2)).toString("base64");
 
