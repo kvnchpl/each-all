@@ -1,3 +1,20 @@
+const CONFIG = {
+    promptsListPath: "prompts.json",
+    promptDataFolder: "prompts",
+    maxImageDimension: 200,
+    defaultImageQuality: 0.5,
+    submitEndpoint: "/.netlify/functions/submitImage"
+};
+
+const SELECTORS = {
+    usernameInput: "username-input",
+    submissionForm: "submission-form",
+    imageInput: "image-input",
+    captionInput: "caption-input",
+    filenamePreview: "filename-preview",
+    promptGrid: "prompt-grid"
+}
+
 // ==== USERNAME MANAGEMENT ====
 
 function getOrCreateUsername() {
@@ -54,13 +71,13 @@ async function submitImage(promptId, fileInput, captionInput) {
 
     const urlParams = new URLSearchParams(window.location.search);
     const qualityParam = parseFloat(urlParams.get("quality"));
-    const quality = !isNaN(qualityParam) && qualityParam >= 0 && qualityParam <= 1 ? qualityParam : 0.5;
+    const quality = !isNaN(qualityParam) && qualityParam >= 0 && qualityParam <= 1 ? qualityParam : CONFIG.defaultImageQuality;
 
     const maxDimParam = parseInt(urlParams.get("maxDim"));
-    const maxDim = !isNaN(maxDimParam) && maxDimParam > 0 ? maxDimParam : 200;
+    const maxDim = !isNaN(maxDimParam) && maxDimParam > 0 ? maxDimParam : CONFIG.maxImageDimension;
 
     const imageData = await resizeAndCompressImage(file, quality, maxDim);
-    const username = document.getElementById("username-input").value.trim() || getOrCreateUsername();
+    const username = document.getElementById(SELECTORS.usernameInput).value.trim() || getOrCreateUsername();
     const caption = captionInput.value;
 
     const payload = {
@@ -71,7 +88,7 @@ async function submitImage(promptId, fileInput, captionInput) {
     };
 
     try {
-        const res = await fetch("/.netlify/functions/submitImage", {
+        const res = await fetch(CONFIG.submitEndpoint, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -84,8 +101,8 @@ async function submitImage(promptId, fileInput, captionInput) {
             alert("Submission successful! Please check this page in a few minutes to see your submission.");
             fileInput.value = "";
             captionInput.value = "";
-            document.getElementById("filename-preview").textContent = "";
-            const form = document.getElementById("submission-form");
+            document.getElementById(SELECTORS.filenamePreview).textContent = "";
+            const form = document.getElementById(SELECTORS.submissionForm);
             form.reset();
         } else {
             alert("Submission failed. " + (result.error || "Unknown error"));
@@ -102,7 +119,7 @@ let currentPromptId = "";
 
 function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
     currentPromptId = promptId;
-    fetch("prompts.json")
+    fetch(CONFIG.promptsListPath)
         .then(res => res.json())
         .then(prompts => {
             const promptObj = prompts.find(p => p.id === promptId);
@@ -117,7 +134,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
     const container = document.getElementById("submissions-container");
     console.log("Loading submissions...");
 
-    fetch(`prompts/${promptId}.json`)
+    fetch(`${CONFIG.promptDataFolder}/${promptId}.json`)
         .then(res => {
             if (!res.ok) {
                 console.warn(`No submission file yet for prompt ${promptId}.`);
@@ -193,14 +210,14 @@ function closeModal() {
     url.searchParams.delete("prompt");
     url.searchParams.delete("seed");
     window.history.pushState({}, "", url);
-    document.getElementById("image-input").value = "";
-    document.getElementById("filename-preview").textContent = "";
+    document.getElementById(SELECTORS.imageInput).value = "";
+    document.getElementById(SELECTORS.filenamePreview).textContent = "";
 }
 
 function handleSubmit() {
-    const form = document.getElementById("submission-form");
-    const fileInput = form.elements["image-input"];
-    const captionInput = form.elements["caption-input"];
+    const form = document.getElementById(SELECTORS.submissionForm);
+    const fileInput = form.elements[SELECTORS.imageInput];
+    const captionInput = form.elements[SELECTORS.captionInput];
     submitImage(currentPromptId, fileInput, captionInput);
 }
 
@@ -216,10 +233,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Load prompt data
-    fetch("prompts.json")
+    fetch(CONFIG.promptsListPath)
         .then((res) => res.json())
         .then((prompts) => {
-            const grid = document.getElementById("prompt-grid");
+            const grid = document.getElementById(SELECTORS.promptGrid);
             grid.innerHTML = "";
             prompts.forEach((prompt) => {
                 const div = document.createElement("div");
@@ -238,7 +255,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
     // Prefill username input and add listener
-    const usernameInput = document.getElementById("username-input");
+    const usernameInput = document.getElementById(SELECTORS.usernameInput);
     const savedUsername = getUsername() || getOrCreateUsername();
     usernameInput.value = savedUsername;
     usernameInput.addEventListener("input", () => {
@@ -246,7 +263,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Add event listeners for buttons
-    document.getElementById("submission-form").addEventListener("submit", (e) => {
+    document.getElementById(SELECTORS.submissionForm).addEventListener("submit", (e) => {
         e.preventDefault();
         handleSubmit();
     });
@@ -309,8 +326,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ==== IMAGE PREVIEW HANDLER ====
 
-document.getElementById("image-input").addEventListener("change", (event) => {
+document.getElementById(SELECTORS.imageInput).addEventListener("change", (event) => {
     const file = event.target.files[0];
-    const previewContainer = document.getElementById("filename-preview");
+    const previewContainer = document.getElementById(SELECTORS.filenamePreview);
     previewContainer.textContent = file ? file.name : "";
 });
