@@ -132,7 +132,6 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
     }
 
     const container = document.getElementById("submissions-container");
-    console.log("Loading submissions...");
 
     fetch(`${CONFIG.promptDataFolder}/${promptId}.json`)
         .then(res => {
