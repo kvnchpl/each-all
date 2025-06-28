@@ -198,14 +198,14 @@ h1 {
 
 .caption-left {
     text-align: left;
-    left: 0;
-    right: auto;
+    left: 0 !important;
+    right: auto !important;
 }
 
 .caption-right {
     text-align: right;
-    right: 0;
-    left: auto;
+    right: 0 !important;
+    left: auto !important;
 }
 
 #about-modal {
