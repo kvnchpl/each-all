@@ -149,7 +149,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
 
     const modal = document.getElementById(SELECTORS.submissionModal);
     if (modal) {
-        modal.style.display = "flex";
+        modal.classList.add("visible");
     }
 
     const container = document.getElementById(SELECTORS.submissionsContainer);
@@ -269,7 +269,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
 }
 
 function closeModal() {
-    document.getElementById(SELECTORS.submissionModal).style.display = "none";
+    document.getElementById(SELECTORS.submissionModal).classList.remove("visible");
     const url = new URL(window.location);
     url.searchParams.delete("prompt");
     url.searchParams.delete("seed");
@@ -355,11 +355,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     document.getElementById(SELECTORS.aboutButton).addEventListener("click", () => {
-        document.getElementById(SELECTORS.aboutModal).style.display = "flex";
+        document.getElementById(SELECTORS.aboutModal).classList.add("visible");
     });
 
     document.getElementById(SELECTORS.aboutClose).addEventListener("click", () => {
-        document.getElementById(SELECTORS.aboutModal).style.display = "none";
+        document.getElementById(SELECTORS.aboutModal).classList.remove("visible");
     });
 
     // Tap-to-toggle captions on mobile (only one visible at a time, tap outside hides)
