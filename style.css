@@ -263,6 +263,10 @@ h1 {
     text-decoration: underline;
 }
 
+#about-button:hover {
+    font-weight: bold;
+}
+
 .uppercase {
     text-transform: uppercase;
 }
