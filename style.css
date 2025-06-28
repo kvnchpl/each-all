@@ -261,6 +261,7 @@ h1 {
     color: var(--highlight-color);
     cursor: pointer;
     text-decoration: underline;
+    font-weight: normal;
 }
 
 #about-button:hover {
