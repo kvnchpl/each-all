@@ -1,7 +1,7 @@
 # Netlify build output (auto-generated)
 .netlify/
 
-# Node modules (don’t commit!)
+# Node modules
 node_modules/
 
 # macOS metadata files
