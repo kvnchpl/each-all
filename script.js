@@ -98,7 +98,11 @@ async function submitImage(promptId, fileInput, captionInput) {
     const maxDim = !isNaN(maxDimParam) && maxDimParam > 0 ? maxDimParam : CONFIG.maxImageDimension;
 
     const imageData = await resizeAndCompressImage(file, quality, maxDim);
-    const username = document.getElementById(SELECTORS.usernameInput).value.trim() || getOrCreateUsername();
+    const username = document.getElementById(SELECTORS.usernameInput).value.trim();
+    if (!username) {
+        alert("Please enter a username before submitting.");
+        return;
+    }
     const caption = captionInput.value;
 
     const payload = {
