@@ -199,7 +199,8 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
 
                 const img = document.createElement("img");
                 img.src = sub.imageData;
-                img.alt = sub.caption || "User submission";
+                img.ondragstart = () => false;
+                img.alt = sub.caption || sub.username || "User submission";
 
                 const caption = document.createElement("div");
                 caption.className = SELECTORS.caption;
