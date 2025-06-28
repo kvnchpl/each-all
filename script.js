@@ -10,7 +10,8 @@ const CONFIG = {
     seedOffsetX: 0,
     seedOffsetY: 2731,
     seedOffsetZ: 9649,
-    maxZIndex: 100
+    maxZIndex: 100,
+    seedMax: 1000000
 };
 
 const SELECTORS = {
@@ -162,7 +163,7 @@ async function submitImage(promptId, fileInput, captionInput) {
 
 // ==== PROMPT MODAL HANDLING ====
 
-function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
+function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax)) {
     currentPromptId = promptId;
     fetch(CONFIG.promptsListPath)
         .then(res => res.json())
@@ -305,7 +306,7 @@ function handleSubmit() {
 
 // ==== PROMPT GRID INITIALIZATION ====
 
-// === Utility: Render prompt tiles ===
+// Render prompt tiles
 function renderPromptTiles(promptArray) {
     const grid = document.getElementById(SELECTORS.promptGrid);
     grid.innerHTML = "";
@@ -314,7 +315,7 @@ function renderPromptTiles(promptArray) {
         div.className = SELECTORS.promptTile;
         div.textContent = prompt.id;
         div.addEventListener("click", () => {
-            const seed = Math.floor(Math.random() * 1000000);
+            const seed = Math.floor(Math.random() * CONFIG.seedMax);
             const url = new URL(window.location);
             url.searchParams.set("prompt", prompt.id);
             url.searchParams.set("seed", seed);
@@ -325,7 +326,7 @@ function renderPromptTiles(promptArray) {
     });
 }
 
-// === Event Handlers for Sorting, Random, Toggle Header ===
+// Event Handlers for Sorting, Random, Toggle Header
 let currentPrompts = [];
 let sortPopularDescending = true;
 let sortIdAscending = true;
@@ -357,7 +358,7 @@ function handleRandomizeSeed() {
     const url = new URL(window.location);
     const currentPrompt = url.searchParams.get("prompt");
     if (currentPrompt) {
-        const newSeed = Math.floor(Math.random() * 1000000);
+        const newSeed = Math.floor(Math.random() * CONFIG.seedMax);
         url.searchParams.set("seed", newSeed);
         window.history.pushState({}, "", url);
         openPrompt(currentPrompt, newSeed);
