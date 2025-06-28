@@ -43,6 +43,20 @@ h1 {
     margin-bottom: var(--padding-base);
 }
 
+/* Sort Controls */
+#sort-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: var(--padding-small);
+    justify-items: center;
+    align-items: center;
+    margin-bottom: var(--padding-base);
+}
+
+#sort-controls .prompt-tile {
+    text-align: center;
+}
+
 /* Prompt Grid (Homepage) */
 #prompt-grid {
     display: grid;
