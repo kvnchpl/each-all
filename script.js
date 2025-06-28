@@ -19,9 +19,7 @@ function getUsername() {
 
 // ==== IMAGE RESIZING & COMPRESSION ====
 
-async function resizeAndCompressImage(file, quality = 0.5) {
-    const maxDim = 200;
-
+async function resizeAndCompressImage(file, quality = 0.5, maxDim = 200) {
     const imageBitmap = await createImageBitmap(file);
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
@@ -58,7 +56,10 @@ async function submitImage(promptId, fileInput, captionInput) {
     const qualityParam = parseFloat(urlParams.get("quality"));
     const quality = !isNaN(qualityParam) && qualityParam >= 0 && qualityParam <= 1 ? qualityParam : 0.5;
 
-    const imageData = await resizeAndCompressImage(file, quality);
+    const maxDimParam = parseInt(urlParams.get("maxDim"));
+    const maxDim = !isNaN(maxDimParam) && maxDimParam > 0 ? maxDimParam : 200;
+
+    const imageData = await resizeAndCompressImage(file, quality, maxDim);
     const username = document.getElementById("username-input").value.trim() || getOrCreateUsername();
     const caption = captionInput.value;
 
