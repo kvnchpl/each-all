@@ -22,7 +22,10 @@ exports.handler = async (event) => {
 
     // Only allow POST requests
     if (event.httpMethod !== "POST") {
-        return { statusCode: 405, body: "Method Not Allowed" };
+        return {
+            statusCode: 405,
+            body: "Method Not Allowed"
+        };
     }
 
     const headers = event.headers;
@@ -33,7 +36,10 @@ exports.handler = async (event) => {
         body = JSON.parse(event.body || "{}");
     } catch (e) {
         console.error("JSON parse error:", e);
-        return { statusCode: 400, body: "Malformed JSON body." };
+        return {
+            statusCode: 400,
+            body: "Malformed JSON body."
+        };
     }
 
     // Validate environment variables
@@ -45,14 +51,24 @@ exports.handler = async (event) => {
     }
 
     // Extract submission data from request
-    const { username, promptId, caption, imageData } = body;
+    const {
+        username,
+        promptId,
+        caption,
+        imageData
+    } = body;
 
     if (!username || !promptId || !imageData) {
-        return { statusCode: 400, body: "Missing required fields" };
+        return {
+            statusCode: 400,
+            body: "Missing required fields"
+        };
     }
 
     // Initialize Octokit with authentication
-    const octokit = new Octokit({ auth: GITHUB_TOKEN });
+    const octokit = new Octokit({
+        auth: GITHUB_TOKEN
+    });
     const filePath = `prompts/${promptId}.json`;
 
     let submissions = [];
@@ -60,7 +76,9 @@ exports.handler = async (event) => {
 
     // Try to load existing submissions file from GitHub
     try {
-        const { data: existingFile } = await octokit.repos.getContent({
+        const {
+            data: existingFile
+        } = await octokit.repos.getContent({
             owner: GITHUB_USER,
             repo: REPO_NAME,
             path: filePath,
@@ -77,7 +95,9 @@ exports.handler = async (event) => {
             console.error("Error retrieving prompt file:", error);
             return {
                 statusCode: 500,
-                body: JSON.stringify({ error: error.message || "Failed to retrieve prompt file." }),
+                body: JSON.stringify({
+                    error: error.message || "Failed to retrieve prompt file."
+                }),
             };
         }
     }
@@ -93,7 +113,9 @@ exports.handler = async (event) => {
 
         // Send a notification email about the new submission
         try {
-            const { Resend } = await import('resend');
+            const {
+                Resend
+            } = await import('resend');
             const resend = new Resend(process.env.RESEND_API_KEY);
 
             const submittedAt = new Intl.DateTimeFormat("en-US", {
@@ -131,18 +153,25 @@ exports.handler = async (event) => {
             path: filePath,
             message: commitMessage,
             content: updatedContent,
-            ...(sha && { sha }), // only include 'sha' if it exists
+            ...(sha && {
+                sha
+            }), // only include 'sha' if it exists
         });
 
         return {
             statusCode: 200,
-            body: JSON.stringify({ success: true, message: "Submission saved." }),
+            body: JSON.stringify({
+                success: true,
+                message: "Submission saved."
+            }),
         };
     } catch (error) {
         console.error("Error updating prompt file:", error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: error.message || "Failed to update submission." }),
+            body: JSON.stringify({
+                error: error.message || "Failed to update submission."
+            }),
         };
     }
 };
