@@ -370,6 +370,28 @@ document.addEventListener("DOMContentLoaded", () => {
                     grid.appendChild(div);
                 });
             });
+
+            // Add Sort by ID button event listener
+            document.getElementById("sort-id-button").addEventListener("click", () => {
+                const sorted = currentPrompts.slice().sort((a, b) => a.id.localeCompare(b.id));
+
+                const grid = document.getElementById(SELECTORS.promptGrid);
+                grid.innerHTML = "";
+                sorted.forEach(prompt => {
+                    const div = document.createElement("div");
+                    div.className = SELECTORS.promptTile;
+                    div.textContent = prompt.id;
+                    div.addEventListener("click", () => {
+                        const seed = Math.floor(Math.random() * 1000000);
+                        const url = new URL(window.location);
+                        url.searchParams.set("prompt", prompt.id);
+                        url.searchParams.set("seed", seed);
+                        window.history.pushState({}, "", url);
+                        openPrompt(prompt.id, seed);
+                    });
+                    grid.appendChild(div);
+                });
+            });
         });
 
     // Prefill username input and add listener
