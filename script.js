@@ -38,6 +38,21 @@ const SELECTORS = {
 
 // ==== USERNAME MANAGEMENT ====
 
+// ==== POPULARITY SORT HELPER ====
+async function getPromptSubmissionCounts(prompts) {
+    const counts = await Promise.all(prompts.map(async (prompt) => {
+        try {
+            const res = await fetch(`${CONFIG.promptDataFolder}/${prompt.id}.json`);
+            if (!res.ok) return { id: prompt.id, count: 0 };
+            const data = await res.json();
+            return { id: prompt.id, count: Array.isArray(data) ? data.length : 0 };
+        } catch {
+            return { id: prompt.id, count: 0 };
+        }
+    }));
+    return counts;
+}
+
 function getOrCreateUsername() {
     let username = localStorage.getItem("eachAllUsername");
     if (!username) {
@@ -323,6 +338,37 @@ document.addEventListener("DOMContentLoaded", () => {
                     openPrompt(prompt.id, seed);
                 });
                 grid.appendChild(div);
+            });
+
+            // Store original order for sorting
+            let currentPrompts = prompts.slice();
+
+            document.getElementById("sort-button").addEventListener("click", async () => {
+                const counts = await getPromptSubmissionCounts(currentPrompts);
+                const countMap = Object.fromEntries(counts.map(c => [c.id, c.count]));
+
+                const sorted = currentPrompts.slice().sort((a, b) => {
+                    const countDiff = (countMap[b.id] || 0) - (countMap[a.id] || 0);
+                    if (countDiff !== 0) return countDiff;
+                    return a.id.localeCompare(b.id);
+                });
+
+                const grid = document.getElementById(SELECTORS.promptGrid);
+                grid.innerHTML = "";
+                sorted.forEach(prompt => {
+                    const div = document.createElement("div");
+                    div.className = SELECTORS.promptTile;
+                    div.textContent = prompt.id;
+                    div.addEventListener("click", () => {
+                        const seed = Math.floor(Math.random() * 1000000);
+                        const url = new URL(window.location);
+                        url.searchParams.set("prompt", prompt.id);
+                        url.searchParams.set("seed", seed);
+                        window.history.pushState({}, "", url);
+                        openPrompt(prompt.id, seed);
+                    });
+                    grid.appendChild(div);
+                });
             });
         });
 
