@@ -9,6 +9,7 @@ const CONFIG = {
 };
 
 const SELECTORS = {
+    modalHeader: "modal-header",
     submissionModal: "submission-modal",
     submissionsContainer: "submissions-container",
     submissionsWrapper: "submissions-wrapper",
@@ -17,6 +18,8 @@ const SELECTORS = {
     imageInput: "image-input",
     captionInput: "caption-input",
     filenamePreview: "filename-preview",
+    submitButton: "submit-button",
+    toggleHeader: "toggle-header",
     returnButton: "return-button",
     randomizeButton: "randomize-button",
     promptGrid: "prompt-grid",
@@ -282,6 +285,14 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById(SELECTORS.submissionForm).addEventListener("submit", (e) => {
         e.preventDefault();
         handleSubmit();
+    });
+
+    document.getElementById(SELECTORS.toggleHeader).addEventListener("click", () => {
+        const header = document.getElementById(SELECTORS.modalHeader);
+        const isMinimized = header.classList.toggle("minimized");
+
+        const toggleBtn = document.getElementById(SELECTORS.toggleHeader);
+        toggleBtn.textContent = isMinimized ? "+" : "–";
     });
 
     document.getElementById(SELECTORS.returnButton).addEventListener("click", closeModal);

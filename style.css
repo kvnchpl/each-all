@@ -237,6 +237,12 @@ h1 {
     text-transform: uppercase;
 }
 
+#modal-header.minimized {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
 @media (max-width: 768px) {
     .modal-content {
         width: 90vw;
@@ -252,6 +258,8 @@ h1 {
 
     #submissions-container {
         width: 100%;
+        height: 100vh;
+        overflow: auto;
         height: auto;
         position: relative;
     }
@@ -259,7 +267,6 @@ h1 {
     #submission-modal {
         flex-direction: column;
         overflow-y: auto;
-        padding: var(--padding-small);
     }
 
     .modal-bottom {
