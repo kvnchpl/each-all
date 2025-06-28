@@ -263,7 +263,7 @@ h1 {
         padding: var(--padding-small);
     }
 
-    #modal-bottom {
+    .modal-bottom {
         margin-bottom: 0;
     }
 }
