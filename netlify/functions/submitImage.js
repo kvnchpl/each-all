@@ -96,11 +96,11 @@ exports.handler = async (event) => {
             await resend.emails.send({
                 from: process.env.FROM_EMAIL || 'no-reply@resend.dev',
                 to: process.env.NOTIFY_EMAIL,
-                subject: `EACH ALL: New submission to Prompt ${promptId}`,
+                subject: `EACH ALL: new submission to prompt ${promptId}`,
                 html: `
               <p><strong>${username}</strong> submitted an image to prompt <strong>${promptId}</strong>.</p>
-              ${caption ? `<p>Caption: ${caption}</p>` : ""}
-              <p>Submitted at: ${submittedAt}</p>
+              ${caption ? `<p>caption: ${caption}</p>` : ""}
+              <p>submitted at: ${submittedAt}</p>
             `,
             });
         } catch (emailError) {
