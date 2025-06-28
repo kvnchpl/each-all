@@ -162,8 +162,6 @@ async function submitImage(promptId, fileInput, captionInput) {
 
 // ==== PROMPT MODAL HANDLING ====
 
-let currentPromptId = "";
-
 function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
     currentPromptId = promptId;
     fetch(CONFIG.promptsListPath)
@@ -307,11 +305,89 @@ function handleSubmit() {
 
 // ==== PROMPT GRID INITIALIZATION ====
 
+// === Utility: Render prompt tiles ===
+function renderPromptTiles(promptArray) {
+    const grid = document.getElementById(SELECTORS.promptGrid);
+    grid.innerHTML = "";
+    promptArray.forEach((prompt) => {
+        const div = document.createElement("div");
+        div.className = SELECTORS.promptTile;
+        div.textContent = prompt.id;
+        div.addEventListener("click", () => {
+            const seed = Math.floor(Math.random() * 1000000);
+            const url = new URL(window.location);
+            url.searchParams.set("prompt", prompt.id);
+            url.searchParams.set("seed", seed);
+            window.history.pushState({}, "", url);
+            openPrompt(prompt.id, seed);
+        });
+        grid.appendChild(div);
+    });
+}
+
+// === Event Handlers for Sorting, Random, Toggle Header ===
+let currentPrompts = [];
+let sortPopularDescending = true;
+let sortIdAscending = true;
+let sortIndicators = {};
+let currentPromptId = ""; // Moved closer to modal logic as requested
+
+async function handleSortByPopularity() {
+    const counts = await getPromptSubmissionCounts(currentPrompts);
+    const countMap = Object.fromEntries(counts.map(c => [c.id, c.count]));
+    const sorted = currentPrompts.slice().sort((a, b) => {
+        const diff = (countMap[b.id] || 0) - (countMap[a.id] || 0);
+        return sortPopularDescending ? diff : -diff;
+    });
+    sortPopularDescending = !sortPopularDescending;
+    updateSortIndicators("popular", sortPopularDescending);
+    renderPromptTiles(sorted);
+}
+
+function handleSortById() {
+    const sorted = currentPrompts.slice().sort((a, b) => {
+        return sortIdAscending ? a.id.localeCompare(b.id) : b.id.localeCompare(a.id);
+    });
+    sortIdAscending = !sortIdAscending;
+    updateSortIndicators("id", sortIdAscending);
+    renderPromptTiles(sorted);
+}
+
+function handleRandomizeSeed() {
+    const url = new URL(window.location);
+    const currentPrompt = url.searchParams.get("prompt");
+    if (currentPrompt) {
+        const newSeed = Math.floor(Math.random() * 1000000);
+        url.searchParams.set("seed", newSeed);
+        window.history.pushState({}, "", url);
+        openPrompt(currentPrompt, newSeed);
+    }
+}
+
+function handleToggleHeader(e) {
+    e.preventDefault();
+    const header = document.getElementById(SELECTORS.modalHeader);
+    const isMinimized = header.classList.toggle("minimized");
+    const toggleBtn = document.getElementById(SELECTORS.toggleHeader);
+    toggleBtn.textContent = isMinimized ? "↓" : "↑";
+}
+
+function updateSortIndicators(activeKey, direction) {
+    Object.keys(sortIndicators).forEach(key => {
+        const btn = sortIndicators[key];
+        if (key === activeKey) {
+            btn.textContent = key === "popular" ? "Popular" : "ID";
+            btn.textContent += direction ? " ↓" : " ↑";
+        } else {
+            btn.textContent = key === "popular" ? "Popular" : "ID";
+        }
+    });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
     const promptId = urlParams.get("prompt");
     const seed = urlParams.get("seed");
-
     if (promptId) {
         openPrompt(promptId, seed ? parseInt(seed) : undefined);
     }
@@ -320,102 +396,12 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch(CONFIG.promptsListPath)
         .then((res) => res.json())
         .then((prompts) => {
-            const grid = document.getElementById(SELECTORS.promptGrid);
-            grid.innerHTML = "";
-            prompts.forEach((prompt) => {
-                const div = document.createElement("div");
-                div.className = SELECTORS.promptTile;
-                div.textContent = prompt.id;
-                div.addEventListener("click", () => {
-                    const seed = Math.floor(Math.random() * 1000000);
-                    const url = new URL(window.location);
-                    url.searchParams.set("prompt", prompt.id);
-                    url.searchParams.set("seed", seed);
-                    window.history.pushState({}, "", url);
-                    openPrompt(prompt.id, seed);
-                });
-                grid.appendChild(div);
-            });
-
-            // Store original order for sorting
-            let currentPrompts = prompts.slice();
-            // Add sort direction trackers
-            let sortPopularDescending = true;
-            let sortIdAscending = true;
-
-            // Sort indicator state ===
-            let sortIndicators = {
+            currentPrompts = prompts.slice();
+            renderPromptTiles(prompts);
+            sortIndicators = {
                 popular: document.getElementById(SELECTORS.sortPopularButton),
                 id: document.getElementById(SELECTORS.sortIdButton)
             };
-
-            function updateSortIndicators(activeKey, direction) {
-                Object.keys(sortIndicators).forEach(key => {
-                    const btn = sortIndicators[key];
-                    if (key === activeKey) {
-                        btn.textContent = key === "Popular" ? "Popular" : "ID";
-                        btn.textContent += direction ? " ↓" : " ↑";
-                    } else {
-                        btn.textContent = key === "Popular" ? "Popular" : "ID";
-                    }
-                });
-            }
-
-            document.getElementById(SELECTORS.sortPopularButton).addEventListener("click", async () => {
-                const counts = await getPromptSubmissionCounts(currentPrompts);
-                const countMap = Object.fromEntries(counts.map(c => [c.id, c.count]));
-
-                const sorted = currentPrompts.slice().sort((a, b) => {
-                    const diff = (countMap[b.id] || 0) - (countMap[a.id] || 0);
-                    return sortPopularDescending ? diff : -diff;
-                });
-
-                sortPopularDescending = !sortPopularDescending;
-                updateSortIndicators("popular", sortPopularDescending);
-
-                const grid = document.getElementById(SELECTORS.promptGrid);
-                grid.innerHTML = "";
-                sorted.forEach(prompt => {
-                    const div = document.createElement("div");
-                    div.className = SELECTORS.promptTile;
-                    div.textContent = prompt.id;
-                    div.addEventListener("click", () => {
-                        const seed = Math.floor(Math.random() * 1000000);
-                        const url = new URL(window.location);
-                        url.searchParams.set("prompt", prompt.id);
-                        url.searchParams.set("seed", seed);
-                        window.history.pushState({}, "", url);
-                        openPrompt(prompt.id, seed);
-                    });
-                    grid.appendChild(div);
-                });
-            });
-
-            document.getElementById(SELECTORS.sortIdButton).addEventListener("click", () => {
-                const sorted = currentPrompts.slice().sort((a, b) => {
-                    return sortIdAscending ? a.id.localeCompare(b.id) : b.id.localeCompare(a.id);
-                });
-
-                sortIdAscending = !sortIdAscending;
-                updateSortIndicators("id", sortIdAscending);
-
-                const grid = document.getElementById(SELECTORS.promptGrid);
-                grid.innerHTML = "";
-                sorted.forEach(prompt => {
-                    const div = document.createElement("div");
-                    div.className = SELECTORS.promptTile;
-                    div.textContent = prompt.id;
-                    div.addEventListener("click", () => {
-                        const seed = Math.floor(Math.random() * 1000000);
-                        const url = new URL(window.location);
-                        url.searchParams.set("prompt", prompt.id);
-                        url.searchParams.set("seed", seed);
-                        window.history.pushState({}, "", url);
-                        openPrompt(prompt.id, seed);
-                    });
-                    grid.appendChild(div);
-                });
-            });
         });
 
     // Prefill username input and add listener
@@ -432,32 +418,14 @@ document.addEventListener("DOMContentLoaded", () => {
         handleSubmit();
     });
 
-    document.getElementById(SELECTORS.toggleHeader).addEventListener("click", (e) => {
-        e.preventDefault();
-        const header = document.getElementById(SELECTORS.modalHeader);
-        const isMinimized = header.classList.toggle("minimized");
-
-        const toggleBtn = document.getElementById(SELECTORS.toggleHeader);
-        toggleBtn.textContent = isMinimized ? "↓" : "↑";
-    });
-
+    document.getElementById(SELECTORS.toggleHeader).addEventListener("click", handleToggleHeader);
     document.getElementById(SELECTORS.returnButton).addEventListener("click", closeModal);
-
-    document.getElementById(SELECTORS.randomizeButton).addEventListener("click", () => {
-        const url = new URL(window.location);
-        const currentPrompt = url.searchParams.get("prompt");
-        if (currentPrompt) {
-            const newSeed = Math.floor(Math.random() * 1000000);
-            url.searchParams.set("seed", newSeed);
-            window.history.pushState({}, "", url);
-            openPrompt(currentPrompt, newSeed);
-        }
-    });
-
+    document.getElementById(SELECTORS.randomizeButton).addEventListener("click", handleRandomizeSeed);
+    document.getElementById(SELECTORS.sortPopularButton).addEventListener("click", handleSortByPopularity);
+    document.getElementById(SELECTORS.sortIdButton).addEventListener("click", handleSortById);
     document.getElementById(SELECTORS.aboutButton).addEventListener("click", () => {
         document.getElementById(SELECTORS.aboutModal).classList.add("visible");
     });
-
     document.getElementById(SELECTORS.aboutClose).addEventListener("click", () => {
         document.getElementById(SELECTORS.aboutModal).classList.remove("visible");
     });
@@ -465,27 +433,22 @@ document.addEventListener("DOMContentLoaded", () => {
     // Tap-to-toggle captions on mobile (only one visible at a time, tap outside hides)
     if (window.innerWidth <= 768) {
         let currentlyVisibleCaption = null;
-
         document.querySelectorAll("." + SELECTORS.submissionWrapper).forEach(wrapper => {
             wrapper.addEventListener("click", (event) => {
                 event.stopPropagation(); // Prevent the global click from triggering
                 const caption = wrapper.querySelector("." + SELECTORS.caption);
                 if (!caption) return;
-
                 // Hide the currently visible caption if it's different
                 if (currentlyVisibleCaption && currentlyVisibleCaption !== caption) {
                     currentlyVisibleCaption.classList.remove("caption-visible");
                     currentlyVisibleCaption.classList.add("caption-hidden");
                 }
-
                 const isVisible = caption.classList.contains("caption-visible");
                 caption.classList.toggle("caption-visible", !isVisible);
                 caption.classList.toggle("caption-hidden", isVisible);
-
                 currentlyVisibleCaption = isVisible ? null : caption;
             });
         });
-
         // Hide caption if tapping anywhere else
         document.addEventListener("click", () => {
             if (currentlyVisibleCaption) {
