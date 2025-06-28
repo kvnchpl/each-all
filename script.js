@@ -9,12 +9,23 @@ const CONFIG = {
 };
 
 const SELECTORS = {
-    usernameInput: "username-input",
+    submissionModal: "submission-modal",
+    submissionsContainer: "submissions-container",
+    submissionsWrapper: "submissions-wrapper",
     submissionForm: "submission-form",
+    usernameInput: "username-input",
     imageInput: "image-input",
     captionInput: "caption-input",
     filenamePreview: "filename-preview",
-    promptGrid: "prompt-grid"
+    returnButton: "return-button",
+    randomizeButton: "randomize-button",
+    promptGrid: "prompt-grid",
+    promptText: "prompt-text",
+
+    aboutButton: "about-button",
+    aboutModal: "about-modal",
+    aboutClose: "about-close",
+    caption: "caption"
 }
 
 // ==== USERNAME MANAGEMENT ====
@@ -130,15 +141,15 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
         .then(res => res.json())
         .then(prompts => {
             const promptObj = prompts.find(p => p.id === promptId);
-            document.getElementById("prompt-text").textContent = promptObj ? `${promptId}: ${promptObj.prompt}` : promptId;
+            document.getElementById(SELECTORS.promptText).textContent = promptObj ? `${promptId}: ${promptObj.prompt}` : promptId;
         });
 
-    const modal = document.getElementById("submission-modal");
+    const modal = document.getElementById(SELECTORS.submissionModal);
     if (modal) {
         modal.style.display = "flex";
     }
 
-    const container = document.getElementById("submissions-container");
+    const container = document.getElementById(SELECTORS.submissionsContainer);
 
     fetch(`${CONFIG.promptDataFolder}/${promptId}.json`)
         .then(res => {
@@ -211,7 +222,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * 1000000)) {
 }
 
 function closeModal() {
-    document.getElementById("submission-modal").style.display = "none";
+    document.getElementById(SELECTORS.submissionModal).style.display = "none";
     const url = new URL(window.location);
     url.searchParams.delete("prompt");
     url.searchParams.delete("seed");
@@ -274,9 +285,9 @@ document.addEventListener("DOMContentLoaded", () => {
         handleSubmit();
     });
 
-    document.getElementById("return-button").addEventListener("click", closeModal);
+    document.getElementById(SELECTORS.returnButton).addEventListener("click", closeModal);
 
-    document.getElementById("randomize-button").addEventListener("click", () => {
+    document.getElementById(SELECTORS.randomizeButton).addEventListener("click", () => {
         const url = new URL(window.location);
         const currentPrompt = url.searchParams.get("prompt");
         if (currentPrompt) {
@@ -287,22 +298,22 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    document.getElementById("about-button").addEventListener("click", () => {
-        document.getElementById("about-modal").style.display = "flex";
+    document.getElementById(SELECTORS.aboutButton).addEventListener("click", () => {
+        document.getElementById(SELECTORS.aboutModal).style.display = "flex";
     });
 
-    document.getElementById("about-close").addEventListener("click", () => {
-        document.getElementById("about-modal").style.display = "none";
+    document.getElementById(SELECTORS.aboutClose).addEventListener("click", () => {
+        document.getElementById(SELECTORS.aboutModal).style.display = "none";
     });
 
     // Tap-to-toggle captions on mobile (only one visible at a time, tap outside hides)
     if (window.innerWidth <= 768) {
         let currentlyVisibleCaption = null;
 
-        document.querySelectorAll(".submission-wrapper").forEach(wrapper => {
+        document.querySelectorAll(SELECTORS.submissionsWrapper).forEach(wrapper => {
             wrapper.addEventListener("click", (event) => {
                 event.stopPropagation(); // Prevent the global click from triggering
-                const caption = wrapper.querySelector(".caption");
+                const caption = wrapper.querySelector(SELECTORS.caption);
                 if (!caption) return;
 
                 // Hide the currently visible caption if it's different
