@@ -357,10 +357,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 Object.keys(sortIndicators).forEach(key => {
                     const btn = sortIndicators[key];
                     if (key === activeKey) {
-                        btn.textContent = key === "popular" ? "Sort by Popularity" : "Sort by ID";
+                        btn.textContent = key === "Popular" ? "Popular" : "ID";
                         btn.textContent += direction ? " ↓" : " ↑";
                     } else {
-                        btn.textContent = key === "popular" ? "Sort by Popularity" : "Sort by ID";
+                        btn.textContent = key === "Popular" ? "Popular" : "ID";
                     }
                 });
             }
