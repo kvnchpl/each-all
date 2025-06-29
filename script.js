@@ -230,6 +230,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax))
     }
 
     const container = document.getElementById(SELECTORS.submissionsContainer);
+    container.innerHTML = "";
 
     // Fetch and display submissions for the prompt
     fetch(`${CONFIG.promptDataFolder}/${promptId}.json`)
@@ -245,8 +246,6 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax))
                 console.warn(`No submissions found for prompt ${promptId}.`);
                 return;
             }
-
-            container.innerHTML = "";
 
             // Group submissions by username
             const grouped = {};
