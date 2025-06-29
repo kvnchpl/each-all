@@ -453,11 +453,11 @@ document.addEventListener("DOMContentLoaded", () => {
         .then((res) => res.json())
         .then((prompts) => {
             currentPrompts = prompts.slice();
-            renderPromptTiles(prompts);
             sortIndicators = {
                 popular: document.getElementById(SELECTORS.sortPopularButton),
                 id: document.getElementById(SELECTORS.sortIdButton)
             };
+            handleSortById(); // Activate default sort by ID ascending
         });
 
     // Prefill username input and save changes
