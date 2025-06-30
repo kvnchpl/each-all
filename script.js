@@ -197,12 +197,11 @@ function openPrompt(promptId, seed = generateRandomSeed(), skipFetch = false) {
             .then(res => {
                 if (!res.ok) {
                     console.warn(`No submission file yet for prompt ${promptId}.`);
-                    return null;
+                    return [];
                 }
                 return res.json();
             })
             .then(submissions => {
-                if (submissions === null) return;
                 if (!Array.isArray(submissions) || submissions.length === 0) {
                     console.warn(`No submissions found for prompt ${promptId}.`);
                     container.innerHTML = "<div>no submissions yet — be the first to add one!</div>";
