@@ -489,10 +489,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
     const promptId = urlParams.get("prompt");
     const seed = urlParams.get("seed");
-    if (promptId) {
-        // Open prompt modal if prompt param is present
-        openPrompt(promptId, seed ? parseInt(seed) : undefined);
-    }
 
     // Load prompt data and initialize grid
     fetch(CONFIG.promptsListPath)
@@ -504,6 +500,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 id: document.getElementById(SELECTORS.sortIdButton)
             };
             handleSortById(); // Activate default sort by ID ascending
+
+            // Open prompt modal after currentPrompts is set
+            if (promptId) {
+                openPrompt(promptId, seed ? parseInt(seed) : undefined);
+            }
         });
 
     // Prefill username input and save changes
