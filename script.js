@@ -196,12 +196,16 @@ function openPrompt(promptId, seed = generateRandomSeed(), skipFetch = false) {
         fetch(`${CONFIG.promptDataFolder}/${promptId}.json`)
             .then(res => {
                 if (!res.ok) {
-                    console.warn(`No submission file yet for prompt ${promptId}.`);
-                    return [];
+                    return null;
                 }
                 return res.json();
             })
             .then(submissions => {
+                if (submissions === null) {
+                    console.warn(`No submission file yet for prompt ${promptId}.`);
+                    container.innerHTML = "<div class='no-submissions'>no submissions yet – be the first to add one!</div>";
+                    return;
+                }
                 if (!Array.isArray(submissions) || submissions.length === 0) {
                     console.warn(`No submissions found for prompt ${promptId}.`);
                     container.innerHTML = "<div class='no-submissions'>no submissions yet – be the first to add one!</div>";
