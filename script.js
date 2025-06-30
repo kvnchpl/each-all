@@ -194,9 +194,9 @@ function openPrompt(promptId, seed = generateRandomSeed(), skipFetch = false) {
     // Fetch and display submissions for the prompt
     if (!skipFetch) {
         fetch(`${CONFIG.promptDataFolder}/${promptId}.json`)
-            .then(res => res.ok ? res.json() : null)
+            .then(res => res.ok ? res.json() : Promise.resolve(null))
             .then(submissions => {
-                if (submissions === null) {
+                if (!submissions) {
                     console.warn(`No submission file yet for prompt ${promptId}.`);
                     container.innerHTML = "<div class='no-submissions'>no submissions yet – be the first to add one!</div>";
                     return;
