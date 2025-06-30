@@ -49,8 +49,14 @@ const SELECTORS = {
 
 let currentPromptId = "";
 let currentPrompts = [];
-let sortPopularDescending = true;
-let sortIdAscending = true;
+const sortDefaults = {
+    id: "ascending",
+    popular: "descending"
+};
+let sortDirections = {
+    id: "ascending",
+    popular: "descending"
+};
 let sortIndicators = {};
 let lastSortKey = null;
 
@@ -364,6 +370,18 @@ function handleToggleHeader(e) {
     toggleBtn.textContent = isMinimized ? "↓" : "↑";
 }
 
+// Randomize the seed for current prompt and reload modal
+function handleRandomizeSeed() {
+    const url = new URL(window.location);
+    const currentPrompt = url.searchParams.get("prompt");
+    if (currentPrompt) {
+        const newSeed = Math.floor(Math.random() * CONFIG.seedMax);
+        url.searchParams.set("seed", newSeed);
+        window.history.pushState({}, "", url);
+        openPrompt(currentPrompt, newSeed);
+    }
+}
+
 /* PROMPT GRID INITIALIZATION */
 
 // Render prompt tiles in the grid
@@ -388,12 +406,26 @@ function renderPromptTiles(promptArray) {
     });
 }
 
+// Update sort indicator arrows on sort buttons
+function updateSortIndicators(activeKey) {
+    Object.keys(sortIndicators).forEach(key => {
+        const btn = sortIndicators[key];
+        const isDefault = sortDirections[key] === sortDefaults[key];
+        if (key === activeKey) {
+            btn.textContent = key === "popular" ? "Popular" : "ID";
+            btn.textContent += isDefault ? " ↑" : " ↓";
+        } else {
+            btn.textContent = key === "popular" ? "Popular" : "ID";
+        }
+    });
+}
+
 // Sort prompts by popularity and re-render tiles
 async function handleSortByPopularity() {
     if (lastSortKey !== "popular") {
-        sortPopularDescending = true; // reset to descending on first click
+        sortDirections.popular = sortDefaults.popular;
     } else {
-        sortPopularDescending = !sortPopularDescending; // toggle on repeat clicks
+        sortDirections.popular = sortDirections.popular === "ascending" ? "descending" : "ascending";
     }
     lastSortKey = "popular";
 
@@ -402,54 +434,30 @@ async function handleSortByPopularity() {
 
     const sorted = currentPrompts.slice().sort((a, b) => {
         const diff = (countMap[b.id] || 0) - (countMap[a.id] || 0);
-        return sortPopularDescending ? diff : -diff;
+        return sortDirections.popular === "descending" ? diff : -diff;
     });
 
-    updateSortIndicators("popular", sortPopularDescending);
+    updateSortIndicators("popular");
     renderPromptTiles(sorted);
 }
 
 // Sort prompts by ID and re-render tiles
 function handleSortById() {
     if (lastSortKey !== "id") {
-        sortIdAscending = true; // reset to ascending on first click
+        sortDirections.id = sortDefaults.id;
     } else {
-        sortIdAscending = !sortIdAscending; // toggle on repeat clicks
+        sortDirections.id = sortDirections.id === "ascending" ? "descending" : "ascending";
     }
     lastSortKey = "id";
 
     const sorted = currentPrompts.slice().sort((a, b) => {
-        return sortIdAscending ? a.id.localeCompare(b.id) : b.id.localeCompare(a.id);
+        return sortDirections.id === "ascending"
+            ? a.id.localeCompare(b.id)
+            : b.id.localeCompare(a.id);
     });
 
-    updateSortIndicators("id", sortIdAscending);
+    updateSortIndicators("id");
     renderPromptTiles(sorted);
-}
-
-// Randomize the seed for current prompt and reload modal
-function handleRandomizeSeed() {
-    const url = new URL(window.location);
-    const currentPrompt = url.searchParams.get("prompt");
-    if (currentPrompt) {
-        const newSeed = Math.floor(Math.random() * CONFIG.seedMax);
-        url.searchParams.set("seed", newSeed);
-        window.history.pushState({}, "", url);
-        openPrompt(currentPrompt, newSeed);
-    }
-}
-
-// Update sort indicator arrows on sort buttons
-function updateSortIndicators(activeKey, direction) {
-    Object.keys(sortIndicators).forEach(key => {
-        const btn = sortIndicators[key];
-        const isDefault = (key === "id" && direction === true) || (key === "popular" && direction === true);
-        if (key === activeKey) {
-            btn.textContent = key === "popular" ? "Popular" : "ID";
-            btn.textContent += isDefault ? " ↑" : " ↓"; // up arrow for sort type default, down arrow for reverse
-        } else {
-            btn.textContent = key === "popular" ? "Popular" : "ID";
-        }
-    });
 }
 
 /* INITIALIZATION ON PAGE LOAD */
