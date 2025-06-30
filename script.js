@@ -254,7 +254,6 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax))
                 return;
             }
 
-            // ==== SUBMISSION RENDERING & POSITIONING ====
             // Group submissions by username
             const grouped = {};
             submissions.forEach((sub) => {
@@ -461,7 +460,7 @@ function handleSortById() {
     renderPromptTiles(sorted);
 }
 
-// ==== INITIALIZATION ON PAGE LOAD ====
+// ==== INITIALIZATION ====
 
 // Main page initialization logic
 document.addEventListener("DOMContentLoaded", () => {
