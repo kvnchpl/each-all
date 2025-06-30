@@ -217,7 +217,7 @@ function handleSubmit() {
     submitImage(currentPromptId, fileInput, captionInput);
 }
 
-// ==== MODAL OPEN & CLOSE LOGIC ====
+// ==== PROMPT MODAL HANDLING ====
 
 // Open the submission modal for a prompt and display its submissions
 function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax), skipFetch = false) {
