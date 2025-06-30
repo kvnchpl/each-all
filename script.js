@@ -198,7 +198,6 @@ async function submitImage(promptId, fileInput, captionInput) {
 
             // Reset form after successful submission
             fileInput.value = "";
-            captionInput.value = "";
             document.getElementById(SELECTORS.filenamePreview).textContent = "";
             const form = document.getElementById(SELECTORS.submissionForm);
             form.reset();
