@@ -78,35 +78,6 @@ function setUsername(newUsername) {
     localStorage.setItem("eachAllUsername", newUsername);
 }
 
-
-// ==== POPULARITY SORT HELPER ====
-
-// Fetch the submission counts for each prompt for popularity sorting
-async function getPromptSubmissionCounts(prompts) {
-    const counts = await Promise.all(prompts.map(async (prompt) => {
-        try {
-            const res = await fetch(`${CONFIG.promptDataFolder}/${prompt.id}.json`);
-            if (!res.ok) return {
-                id: prompt.id,
-                count: 0
-            };
-            const data = await res.json();
-
-            // Count number of submissions if data is array
-            return {
-                id: prompt.id,
-                count: Array.isArray(data) ? data.length : 0
-            };
-        } catch {
-            return {
-                id: prompt.id,
-                count: 0
-            };
-        }
-    }));
-    return counts;
-}
-
 // ==== IMAGE RESIZING & COMPRESSION ====
 
 // Resize and compress the uploaded image file, returning a DataURL
@@ -224,7 +195,7 @@ function handleSubmit() {
 // ==== PROMPT MODAL HANDLING ====
 
 // Open the submission modal for a prompt and display its submissions
-function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax), skipFetch = false) {
+function openPrompt(promptId, seed = generateRandomSeed(), skipFetch = false) {
     currentPromptId = promptId;
 
     // Display prompt text from currentPrompts
@@ -393,11 +364,16 @@ function handleRandomizeSeed() {
     const url = new URL(window.location);
     const currentPrompt = url.searchParams.get("prompt");
     if (currentPrompt) {
-        const newSeed = Math.floor(Math.random() * CONFIG.seedMax);
+        const newSeed = generateRandomSeed();
         url.searchParams.set("seed", newSeed);
         window.history.pushState({}, "", url);
         openPrompt(currentPrompt, newSeed, true);
     }
+}
+
+// Generate a random seed for image positioning and submission display
+function generateRandomSeed() {
+    return Math.floor(Math.random() * CONFIG.seedMax);
 }
 
 // ==== PROMPT GRID INITIALIZATION ====
@@ -413,7 +389,7 @@ function renderPromptTiles(promptArray) {
 
         // Clicking a tile opens the prompt modal for that prompt
         div.addEventListener("click", () => {
-            const seed = Math.floor(Math.random() * CONFIG.seedMax);
+            const seed = generateRandomSeed();
             const url = new URL(window.location);
             url.searchParams.set("prompt", prompt.id);
             url.searchParams.set("seed", seed);
@@ -441,6 +417,32 @@ function updateSortIndicators(activeKey) {
 // Helper function to toggle sort direction for a given key
 function toggleSortDirection(key) {
     sortDirections[key] = sortDirections[key] === "ascending" ? "descending" : "ascending";
+}
+
+// Fetch the submission counts for each prompt for popularity sorting
+async function getPromptSubmissionCounts(prompts) {
+    const counts = await Promise.all(prompts.map(async (prompt) => {
+        try {
+            const res = await fetch(`${CONFIG.promptDataFolder}/${prompt.id}.json`);
+            if (!res.ok) return {
+                id: prompt.id,
+                count: 0
+            };
+            const data = await res.json();
+
+            // Count number of submissions if data is array
+            return {
+                id: prompt.id,
+                count: Array.isArray(data) ? data.length : 0
+            };
+        } catch {
+            return {
+                id: prompt.id,
+                count: 0
+            };
+        }
+    }));
+    return counts;
 }
 
 // Sort prompts by popularity and re-render tiles
