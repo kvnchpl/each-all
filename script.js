@@ -165,24 +165,29 @@ async function submitImage(promptId, fileInput, captionInput) {
     const maxDimParam = parseInt(urlParams.get("maxDim"));
     const maxDim = !isNaN(maxDimParam) && maxDimParam > 0 ? maxDimParam : CONFIG.maxImageDimension;
 
-    // Resize and compress image
-    const imageData = await resizeAndCompressImage(file, quality, maxDim);
-    const username = document.getElementById(SELECTORS.usernameInput).value.trim();
-    if (!username) {
-        alert("hey! make sure to add a username (can be a pseudonym of course).");
-        return;
-    }
-    const caption = captionInput.value;
-
-    // Prepare payload for submission
-    const payload = {
-        username,
-        promptId,
-        caption,
-        imageData
-    };
+    // Disable the submit button before starting submission
+    const submitBtn = document.getElementById(SELECTORS.submitButton);
+    submitBtn.disabled = true;
 
     try {
+        // Resize and compress image
+        const imageData = await resizeAndCompressImage(file, quality, maxDim);
+        const username = document.getElementById(SELECTORS.usernameInput).value.trim();
+        if (!username) {
+            alert("hey! make sure to add a username (can be a pseudonym of course).");
+            document.getElementById(SELECTORS.usernameInput).focus();
+            return;
+        }
+        const caption = captionInput.value;
+
+        // Prepare payload for submission
+        const payload = {
+            username,
+            promptId,
+            caption,
+            imageData
+        };
+
         const res = await fetch(CONFIG.submitEndpoint, {
             method: "POST",
             headers: {
@@ -207,6 +212,9 @@ async function submitImage(promptId, fileInput, captionInput) {
     } catch (error) {
         console.error("Error submitting image:", error);
         alert("something went wrong while submitting. you can try peeking at the console for details, or try again in a bit.");
+    } finally {
+        // Re-enable the submit button after operation completes
+        submitBtn.disabled = false;
     }
 }
 
