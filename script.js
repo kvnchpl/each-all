@@ -260,13 +260,15 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax),
             .then(res => {
                 if (!res.ok) {
                     console.warn(`No submission file yet for prompt ${promptId}.`);
-                    return [];
+                    return null;
                 }
                 return res.json();
             })
             .then(submissions => {
+                if (submissions === null) return;
                 if (!Array.isArray(submissions) || submissions.length === 0) {
                     console.warn(`No submissions found for prompt ${promptId}.`);
+                    container.innerHTML = "<div>no submissions yet — be the first to add one!</div>";
                     return;
                 }
                 cachedSubmissions[promptId] = submissions;
@@ -288,12 +290,6 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax),
 function renderSubmissions(submissions, promptId, seed) {
     const container = document.getElementById(SELECTORS.submissionsContainer);
     container.innerHTML = "";
-
-    // Show a message if there are no submissions
-    if (!Array.isArray(submissions) || submissions.length === 0) {
-        container.innerHTML = "<div>no submissions yet — be the first to add one!</div>";
-        return;
-    }
 
     // Group submissions by username
     const grouped = {};
