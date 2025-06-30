@@ -220,16 +220,22 @@ function handleSubmit() {
 // ==== MODAL OPEN & CLOSE LOGIC ====
 
 // Open the submission modal for a prompt and display its submissions
-function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax)) {
+function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax), skipFetch = false) {
     currentPromptId = promptId;
 
     // Fetch and display prompt text
-    fetch(CONFIG.promptsListPath)
-        .then(res => res.json())
-        .then(prompts => {
-            const promptObj = prompts.find(p => p.id === promptId);
-            document.getElementById(SELECTORS.promptText).textContent = promptObj ? `${promptId}: ${promptObj.prompt}` : promptId;
-        });
+    if (!skipFetch) {
+        fetch(CONFIG.promptsListPath)
+            .then(res => res.json())
+            .then(prompts => {
+                const promptObj = prompts.find(p => p.id === promptId);
+                document.getElementById(SELECTORS.promptText).textContent = promptObj ? `${promptId}: ${promptObj.prompt}` : promptId;
+            });
+    } else {
+        // Use currentPrompts if skipping fetch
+        const promptObj = currentPrompts.find(p => p.id === promptId);
+        document.getElementById(SELECTORS.promptText).textContent = promptObj ? `${promptId}: ${promptObj.prompt}` : promptId;
+    }
 
     const modal = document.getElementById(SELECTORS.submissionModal);
     if (modal) {
@@ -240,114 +246,116 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax))
     container.innerHTML = "";
 
     // Fetch and display submissions for the prompt
-    fetch(`${CONFIG.promptDataFolder}/${promptId}.json`)
-        .then(res => {
-            if (!res.ok) {
-                console.warn(`No submission file yet for prompt ${promptId}.`);
-                return [];
-            }
-            return res.json();
-        })
-        .then(submissions => {
-            if (!Array.isArray(submissions) || submissions.length === 0) {
-                console.warn(`No submissions found for prompt ${promptId}.`);
-                return;
-            }
-
-            // Group submissions by username
-            const grouped = {};
-            submissions.forEach((sub) => {
-                if (!grouped[sub.username]) grouped[sub.username] = [];
-                grouped[sub.username].push(sub);
-            });
-
-            const usernames = Object.keys(grouped);
-
-            usernames.forEach((username, i) => {
-                const userSubs = grouped[username];
-
-                // Deterministically select a submission per user
-                const randIndex = Math.floor(Math.sin(seed + i) * CONFIG.positionVariance) % userSubs.length;
-                const sub = userSubs[Math.abs(randIndex)];
-
-                // Randomize position for each submission
-                const randX = Math.floor(Math.sin(seed + i + CONFIG.seedOffsetX) * (container.clientWidth - CONFIG.maxImageDimension)) % (container.clientWidth - CONFIG.maxImageDimension);
-                const randY = Math.floor(Math.sin(seed + i + CONFIG.seedOffsetY) * (container.clientHeight - CONFIG.maxImageDimension)) % (container.clientHeight - CONFIG.maxImageDimension);
-
-                const wrapper = document.createElement("div");
-                wrapper.className = SELECTORS.submissionWrapper;
-                wrapper.style.left = `${Math.abs(randX)}px`;
-                wrapper.style.top = `${Math.abs(randY)}px`;
-                wrapper.style.zIndex = Math.abs(Math.floor(Math.sin(seed + i + CONFIG.seedOffsetZ) * CONFIG.positionVariance)) % CONFIG.maxZIndex;
-
-                const img = document.createElement("img");
-                img.src = sub.imageData;
-                img.ondragstart = () => false;
-                img.alt = sub.caption || sub.username || "User submission";
-
-                const caption = document.createElement("div");
-                caption.className = SELECTORS.caption;
-                caption.textContent = sub.caption ? `${sub.username}: ${sub.caption}` : sub.username;
-
-                // Set caption alignment and position based on image position
-                const containerMidpoint = container.clientWidth / 2;
-                const wrapperX = Math.abs(randX);
-                if (wrapperX < containerMidpoint) {
-                    caption.classList.add("caption-left");
-                } else {
-                    caption.classList.add("caption-right");
+    if (!skipFetch) {
+        fetch(`${CONFIG.promptDataFolder}/${promptId}.json`)
+            .then(res => {
+                if (!res.ok) {
+                    console.warn(`No submission file yet for prompt ${promptId}.`);
+                    return [];
+                }
+                return res.json();
+            })
+            .then(submissions => {
+                if (!Array.isArray(submissions) || submissions.length === 0) {
+                    console.warn(`No submissions found for prompt ${promptId}.`);
+                    return;
                 }
 
-                wrapper.appendChild(img);
-                wrapper.appendChild(caption);
-                container.appendChild(wrapper);
-
-                // Make wrapper draggable (mouse)
-                let offsetX, offsetY;
-
-                wrapper.addEventListener("mousedown", (e) => {
-                    offsetX = e.clientX - wrapper.offsetLeft;
-                    offsetY = e.clientY - wrapper.offsetTop;
-
-                    function onMouseMove(e) {
-                        wrapper.style.left = `${e.clientX - offsetX}px`;
-                        wrapper.style.top = `${e.clientY - offsetY}px`;
-                    }
-
-                    function onMouseUp() {
-                        document.removeEventListener("mousemove", onMouseMove);
-                        document.removeEventListener("mouseup", onMouseUp);
-                    }
-
-                    document.addEventListener("mousemove", onMouseMove);
-                    document.addEventListener("mouseup", onMouseUp);
+                // Group submissions by username
+                const grouped = {};
+                submissions.forEach((sub) => {
+                    if (!grouped[sub.username]) grouped[sub.username] = [];
+                    grouped[sub.username].push(sub);
                 });
 
-                // Make wrapper draggable (touch)
-                wrapper.addEventListener("touchstart", (e) => {
-                    const touch = e.touches[0];
-                    offsetX = touch.clientX - wrapper.offsetLeft;
-                    offsetY = touch.clientY - wrapper.offsetTop;
+                const usernames = Object.keys(grouped);
 
-                    function onTouchMove(e) {
+                usernames.forEach((username, i) => {
+                    const userSubs = grouped[username];
+
+                    // Deterministically select a submission per user
+                    const randIndex = Math.floor(Math.sin(seed + i) * CONFIG.positionVariance) % userSubs.length;
+                    const sub = userSubs[Math.abs(randIndex)];
+
+                    // Randomize position for each submission
+                    const randX = Math.floor(Math.sin(seed + i + CONFIG.seedOffsetX) * (container.clientWidth - CONFIG.maxImageDimension)) % (container.clientWidth - CONFIG.maxImageDimension);
+                    const randY = Math.floor(Math.sin(seed + i + CONFIG.seedOffsetY) * (container.clientHeight - CONFIG.maxImageDimension)) % (container.clientHeight - CONFIG.maxImageDimension);
+
+                    const wrapper = document.createElement("div");
+                    wrapper.className = SELECTORS.submissionWrapper;
+                    wrapper.style.left = `${Math.abs(randX)}px`;
+                    wrapper.style.top = `${Math.abs(randY)}px`;
+                    wrapper.style.zIndex = Math.abs(Math.floor(Math.sin(seed + i + CONFIG.seedOffsetZ) * CONFIG.positionVariance)) % CONFIG.maxZIndex;
+
+                    const img = document.createElement("img");
+                    img.src = sub.imageData;
+                    img.ondragstart = () => false;
+                    img.alt = sub.caption || sub.username || "User submission";
+
+                    const caption = document.createElement("div");
+                    caption.className = SELECTORS.caption;
+                    caption.textContent = sub.caption ? `${sub.username}: ${sub.caption}` : sub.username;
+
+                    // Set caption alignment and position based on image position
+                    const containerMidpoint = container.clientWidth / 2;
+                    const wrapperX = Math.abs(randX);
+                    if (wrapperX < containerMidpoint) {
+                        caption.classList.add("caption-left");
+                    } else {
+                        caption.classList.add("caption-right");
+                    }
+
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(caption);
+                    container.appendChild(wrapper);
+
+                    // Make wrapper draggable (mouse)
+                    let offsetX, offsetY;
+
+                    wrapper.addEventListener("mousedown", (e) => {
+                        offsetX = e.clientX - wrapper.offsetLeft;
+                        offsetY = e.clientY - wrapper.offsetTop;
+
+                        function onMouseMove(e) {
+                            wrapper.style.left = `${e.clientX - offsetX}px`;
+                            wrapper.style.top = `${e.clientY - offsetY}px`;
+                        }
+
+                        function onMouseUp() {
+                            document.removeEventListener("mousemove", onMouseMove);
+                            document.removeEventListener("mouseup", onMouseUp);
+                        }
+
+                        document.addEventListener("mousemove", onMouseMove);
+                        document.addEventListener("mouseup", onMouseUp);
+                    });
+
+                    // Make wrapper draggable (touch)
+                    wrapper.addEventListener("touchstart", (e) => {
                         const touch = e.touches[0];
-                        wrapper.style.left = `${touch.clientX - offsetX}px`;
-                        wrapper.style.top = `${touch.clientY - offsetY}px`;
-                    }
+                        offsetX = touch.clientX - wrapper.offsetLeft;
+                        offsetY = touch.clientY - wrapper.offsetTop;
 
-                    function onTouchEnd() {
-                        document.removeEventListener("touchmove", onTouchMove);
-                        document.removeEventListener("touchend", onTouchEnd);
-                    }
+                        function onTouchMove(e) {
+                            const touch = e.touches[0];
+                            wrapper.style.left = `${touch.clientX - offsetX}px`;
+                            wrapper.style.top = `${touch.clientY - offsetY}px`;
+                        }
 
-                    document.addEventListener("touchmove", onTouchMove);
-                    document.addEventListener("touchend", onTouchEnd);
+                        function onTouchEnd() {
+                            document.removeEventListener("touchmove", onTouchMove);
+                            document.removeEventListener("touchend", onTouchEnd);
+                        }
+
+                        document.addEventListener("touchmove", onTouchMove);
+                        document.addEventListener("touchend", onTouchEnd);
+                    });
                 });
+            })
+            .catch(err => {
+                console.error("Failed to load submissions:", err);
             });
-        })
-        .catch(err => {
-            console.error("Failed to load submissions:", err);
-        });
+    }
 }
 
 // Close the submission modal and reset form state
@@ -378,7 +386,7 @@ function handleRandomizeSeed() {
         const newSeed = Math.floor(Math.random() * CONFIG.seedMax);
         url.searchParams.set("seed", newSeed);
         window.history.pushState({}, "", url);
-        openPrompt(currentPrompt, newSeed);
+        openPrompt(currentPrompt, newSeed, true);
     }
 }
 
