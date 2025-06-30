@@ -234,6 +234,7 @@ function renderSubmissions(submissions, promptId, seed) {
     });
 
     const usernames = Object.keys(grouped);
+    shuffleArray(usernames, seed);
 
     usernames.forEach((username, i) => {
         const userSubs = grouped[username];
@@ -348,6 +349,14 @@ function handleRandomizeSeed() {
         url.searchParams.set("seed", newSeed);
         window.history.pushState({}, "", url);
         openPrompt(currentPrompt, newSeed, true);
+    }
+}
+
+// Deterministically shuffle an array using Math.sin() and a seed
+function shuffleArray(array, seed) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.abs(Math.floor(Math.sin(seed + i) * CONFIG.positionVariance)) % (i + 1);
+        [array[i], array[j]] = [array[j], array[i]];
     }
 }
 
