@@ -336,4 +336,9 @@ button {
         color: var(--text-color-light);
         border: none;
     }
+
+    #about-content {
+    padding: var(--padding-base);
+    max-width: 70vw;
+}
 }
