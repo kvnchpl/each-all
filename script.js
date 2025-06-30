@@ -9,7 +9,7 @@
 const CONFIG = {
     promptsListPath: "prompts.json",
     promptDataFolder: "prompts",
-    maxImageDimension: 100,
+    maxImageDimension: 200,
     defaultImageQuality: 0.5,
     submitEndpoint: "/.netlify/functions/submitImage",
     positionVariance: 10000,
