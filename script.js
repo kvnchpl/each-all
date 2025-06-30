@@ -204,7 +204,7 @@ function openPrompt(promptId, seed = generateRandomSeed(), skipFetch = false) {
             .then(submissions => {
                 if (!Array.isArray(submissions) || submissions.length === 0) {
                     console.warn(`No submissions found for prompt ${promptId}.`);
-                    container.innerHTML = "<div class='no-submissions'>no submissions yet — be the first to add one!</div>";
+                    container.innerHTML = "<div class='no-submissions'>no submissions yet – be the first to add one!</div>";
                     return;
                 }
                 cachedSubmissions[promptId] = submissions;
