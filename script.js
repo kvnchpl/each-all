@@ -239,8 +239,9 @@ function renderSubmissions(submissions, promptId, seed) {
         const userSubs = grouped[username];
 
         // Deterministically select a submission per user
-        const randIndex = Math.floor(Math.sin(seed + i) * CONFIG.positionVariance) % userSubs.length;
-        const sub = userSubs[Math.abs(randIndex)];
+        const userHash = hashString(username);
+        const randIndex = Math.abs(Math.floor(Math.sin(seed + userHash) * CONFIG.positionVariance)) % userSubs.length;
+        const sub = userSubs[randIndex];
 
         // Randomize position for each submission
         const randX = Math.floor(Math.sin(seed + i + CONFIG.seedOffsetX) * (container.clientWidth - CONFIG.maxImageDimension)) % (container.clientWidth - CONFIG.maxImageDimension);
@@ -353,6 +354,16 @@ function handleRandomizeSeed() {
 // Generate a random seed for image positioning and submission display
 function generateRandomSeed() {
     return Math.floor(Math.random() * CONFIG.seedMax);
+}
+
+// Simple string hashing function for consistent pseudo-randomness
+function hashString(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0; // Convert to 32-bit int
+    }
+    return hash;
 }
 
 // ==== PROMPT GRID INITIALIZATION ====
