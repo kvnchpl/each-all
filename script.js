@@ -4,7 +4,7 @@
 // Handles image submission, prompt management, and UI interactions.
 // This script is designed to work in tandem with a Netlify backend (submitImage.js) for image submission. 
 
-/* CONFIGURATION VARIABLES */
+// ==== CONFIGURATION VARIABLES ====
 
 const CONFIG = {
     promptsListPath: "prompts.json",
@@ -45,7 +45,7 @@ const SELECTORS = {
     sortIdButton: "sort-id-button"
 }
 
-/* STATE VARIABLES */
+// ==== STATE VARIABLES ====
 
 let currentPromptId = "";
 let currentPrompts = [];
@@ -60,7 +60,7 @@ let sortDirections = {
 let sortIndicators = {};
 let lastSortKey = null;
 
-/* USERNAME MANAGEMENT */
+// ==== USERNAME MANAGEMENT ====
 
 // Generate a random username and save it if none exists
 function getOrCreateUsername() {
@@ -82,7 +82,7 @@ function getUsername() {
     return localStorage.getItem("eachAllUsername");
 }
 
-/* POPULARITY SORT HELPER */
+// ==== POPULARITY SORT HELPER ====
 
 // Fetch the submission counts for each prompt for popularity sorting
 async function getPromptSubmissionCounts(prompts) {
@@ -110,7 +110,7 @@ async function getPromptSubmissionCounts(prompts) {
     return counts;
 }
 
-/* IMAGE RESIZING & COMPRESSION */
+// ==== IMAGE RESIZING & COMPRESSION ====
 
 // Resize and compress the uploaded image file, returning a DataURL
 async function resizeAndCompressImage(file, quality = CONFIG.defaultImageQuality, maxDim = CONFIG.maxImageDimension) {
@@ -139,7 +139,7 @@ async function resizeAndCompressImage(file, quality = CONFIG.defaultImageQuality
     });
 }
 
-/* IMAGE SUBMISSION */
+// ==== IMAGE SUBMISSION HANDLING ====
 
 // Handle image form submission: validate, compress, and send to backend
 async function submitImage(promptId, fileInput, captionInput) {
@@ -217,7 +217,7 @@ function handleSubmit() {
     submitImage(currentPromptId, fileInput, captionInput);
 }
 
-/* PROMPT MODAL HANDLING */
+// ==== MODAL OPEN & CLOSE LOGIC ====
 
 // Open the submission modal for a prompt and display its submissions
 function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax)) {
@@ -254,6 +254,7 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax))
                 return;
             }
 
+            // ==== SUBMISSION RENDERING & POSITIONING ====
             // Group submissions by username
             const grouped = {};
             submissions.forEach((sub) => {
@@ -382,7 +383,7 @@ function handleRandomizeSeed() {
     }
 }
 
-/* PROMPT GRID INITIALIZATION */
+// ==== PROMPT GRID INITIALIZATION ====
 
 // Render prompt tiles in the grid
 function renderPromptTiles(promptArray) {
@@ -460,7 +461,7 @@ function handleSortById() {
     renderPromptTiles(sorted);
 }
 
-/* INITIALIZATION ON PAGE LOAD */
+// ==== INITIALIZATION ON PAGE LOAD ====
 
 // Main page initialization logic
 document.addEventListener("DOMContentLoaded", () => {
@@ -492,25 +493,40 @@ document.addEventListener("DOMContentLoaded", () => {
         setUsername(usernameInput.value);
     });
 
-    // Add event listeners for form and UI buttons
+    // ==== EVENT LISTENERS ====
+
+    // Handle image submission form
     document.getElementById(SELECTORS.submissionForm).addEventListener("submit", (e) => {
         e.preventDefault();
         handleSubmit();
     });
 
+    // Toggle header collapse/expand
     document.getElementById(SELECTORS.toggleHeader).addEventListener("click", handleToggleHeader);
+
+    // Close the prompt modal
     document.getElementById(SELECTORS.returnButton).addEventListener("click", closeModal);
+
+    // Randomize the seed for current prompt view
     document.getElementById(SELECTORS.randomizeButton).addEventListener("click", handleRandomizeSeed);
+
+    // Sort prompts by popularity
     document.getElementById(SELECTORS.sortPopularButton).addEventListener("click", handleSortByPopularity);
+
+    // Sort prompts by ID
     document.getElementById(SELECTORS.sortIdButton).addEventListener("click", handleSortById);
+
+    // Open About modal
     document.getElementById(SELECTORS.aboutButton).addEventListener("click", () => {
         document.getElementById(SELECTORS.aboutModal).classList.add("visible");
     });
+
+    // Close About modal
     document.getElementById(SELECTORS.aboutClose).addEventListener("click", () => {
         document.getElementById(SELECTORS.aboutModal).classList.remove("visible");
     });
 
-    // Show filename preview when a file is selected in the image input
+    // Show selected file name in preview
     document.getElementById(SELECTORS.imageInput).addEventListener("change", (event) => {
         const file = event.target.files[0];
         const previewContainer = document.getElementById(SELECTORS.filenamePreview);
