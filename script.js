@@ -442,9 +442,10 @@ function handleRandomizeSeed() {
 function updateSortIndicators(activeKey, direction) {
     Object.keys(sortIndicators).forEach(key => {
         const btn = sortIndicators[key];
+        const isDefault = (key === "id" && direction === true) || (key === "popular" && direction === true);
         if (key === activeKey) {
             btn.textContent = key === "popular" ? "Popular" : "ID";
-            btn.textContent += direction ? " ↓" : " ↑";
+            btn.textContent += isDefault ? " ↑" : " ↓"; // up arrow for sort type default, down arrow for reverse
         } else {
             btn.textContent = key === "popular" ? "Popular" : "ID";
         }
