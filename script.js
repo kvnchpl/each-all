@@ -52,6 +52,7 @@ let currentPrompts = [];
 let sortPopularDescending = true;
 let sortIdAscending = true;
 let sortIndicators = {};
+let lastSortKey = null;
 
 /* USERNAME MANAGEMENT */
 
@@ -389,23 +390,38 @@ function renderPromptTiles(promptArray) {
 
 // Sort prompts by popularity and re-render tiles
 async function handleSortByPopularity() {
+    if (lastSortKey !== "popular") {
+        sortPopularDescending = true; // reset to descending on first click
+    } else {
+        sortPopularDescending = !sortPopularDescending; // toggle on repeat clicks
+    }
+    lastSortKey = "popular";
+
     const counts = await getPromptSubmissionCounts(currentPrompts);
     const countMap = Object.fromEntries(counts.map(c => [c.id, c.count]));
+
     const sorted = currentPrompts.slice().sort((a, b) => {
         const diff = (countMap[b.id] || 0) - (countMap[a.id] || 0);
         return sortPopularDescending ? diff : -diff;
     });
-    sortPopularDescending = !sortPopularDescending;
+
     updateSortIndicators("popular", sortPopularDescending);
     renderPromptTiles(sorted);
 }
 
 // Sort prompts by ID and re-render tiles
 function handleSortById() {
+    if (lastSortKey !== "id") {
+        sortIdAscending = true; // reset to ascending on first click
+    } else {
+        sortIdAscending = !sortIdAscending; // toggle on repeat clicks
+    }
+    lastSortKey = "id";
+
     const sorted = currentPrompts.slice().sort((a, b) => {
         return sortIdAscending ? a.id.localeCompare(b.id) : b.id.localeCompare(a.id);
     });
-    sortIdAscending = !sortIdAscending;
+
     updateSortIndicators("id", sortIdAscending);
     renderPromptTiles(sorted);
 }
