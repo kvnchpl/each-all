@@ -245,6 +245,7 @@ function renderSubmissions(submissions, promptId, seed) {
 
         const rng = mulberry32(seed + userHash);
         const randIndex = Math.floor(rng() * userSubs.length);
+        const sub = userSubs[randIndex];
         const randX = Math.floor(rng() * (container.clientWidth - CONFIG.maxImageRenderDimension));
         const randY = Math.floor(rng() * (container.clientHeight - CONFIG.maxImageRenderDimension));
         const zIndex = Math.floor(rng() * CONFIG.maxZIndex);
