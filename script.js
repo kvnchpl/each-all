@@ -64,7 +64,7 @@ let lastSortKey = null;
 // ==== USERNAME MANAGEMENT ====
 
 // Generate a random username and save it if none exists
-function getOrCreateUsername() {
+function getUsername() {
     let username = localStorage.getItem("eachAllUsername");
     if (!username) {
         username = "user_" + Math.random().toString(36).substring(2, 10);
@@ -78,10 +78,6 @@ function setUsername(newUsername) {
     localStorage.setItem("eachAllUsername", newUsername);
 }
 
-// Retrieve the username from localStorage
-function getUsername() {
-    return localStorage.getItem("eachAllUsername");
-}
 
 // ==== POPULARITY SORT HELPER ====
 
@@ -232,19 +228,9 @@ function handleSubmit() {
 function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax), skipFetch = false) {
     currentPromptId = promptId;
 
-    // Fetch and display prompt text
-    if (!skipFetch) {
-        fetch(CONFIG.promptsListPath)
-            .then(res => res.json())
-            .then(prompts => {
-                const promptObj = prompts.find(p => p.id === promptId);
-                document.getElementById(SELECTORS.promptText).textContent = promptObj ? `${promptId}: ${promptObj.prompt}` : promptId;
-            });
-    } else {
-        // Use currentPrompts if skipping fetch
-        const promptObj = currentPrompts.find(p => p.id === promptId);
-        document.getElementById(SELECTORS.promptText).textContent = promptObj ? `${promptId}: ${promptObj.prompt}` : promptId;
-    }
+    // Display prompt text from currentPrompts
+    const promptObj = currentPrompts.find(p => p.id === promptId);
+    document.getElementById(SELECTORS.promptText).textContent = promptObj ? `${promptId}: ${promptObj.prompt}` : promptId;
 
     const modal = document.getElementById(SELECTORS.submissionModal);
     if (modal) {
@@ -453,12 +439,17 @@ function updateSortIndicators(activeKey) {
     });
 }
 
+// Helper function to toggle sort direction for a given key
+function toggleSortDirection(key) {
+    sortDirections[key] = sortDirections[key] === "ascending" ? "descending" : "ascending";
+}
+
 // Sort prompts by popularity and re-render tiles
 async function handleSortByPopularity() {
     if (lastSortKey !== "popular") {
         sortDirections.popular = sortDefaults.popular;
     } else {
-        sortDirections.popular = sortDirections.popular === "ascending" ? "descending" : "ascending";
+        toggleSortDirection("popular");
     }
     lastSortKey = "popular";
 
@@ -479,7 +470,7 @@ function handleSortById() {
     if (lastSortKey !== "id") {
         sortDirections.id = sortDefaults.id;
     } else {
-        sortDirections.id = sortDirections.id === "ascending" ? "descending" : "ascending";
+        toggleSortDirection("id");
     }
     lastSortKey = "id";
 
@@ -519,7 +510,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Prefill username input and save changes
     const usernameInput = document.getElementById(SELECTORS.usernameInput);
-    const savedUsername = getUsername() || getOrCreateUsername();
+    const savedUsername = getUsername();
     usernameInput.value = savedUsername;
     usernameInput.addEventListener("input", () => {
         setUsername(usernameInput.value);
