@@ -243,15 +243,15 @@ function renderSubmissions(submissions, promptId, seed) {
         const randIndex = Math.abs(Math.floor(Math.sin(seed + userHash) * CONFIG.positionVariance)) % userSubs.length;
         const sub = userSubs[randIndex];
 
-        // Randomize position for each submission
-        const randX = Math.floor(Math.sin(seed + i + CONFIG.seedOffsetX) * (container.clientWidth - CONFIG.maxImageDimension)) % (container.clientWidth - CONFIG.maxImageDimension);
-        const randY = Math.floor(Math.sin(seed + i + CONFIG.seedOffsetY) * (container.clientHeight - CONFIG.maxImageDimension)) % (container.clientHeight - CONFIG.maxImageDimension);
+        // Randomize position for each submission using seed, userHash, and offset
+        const randX = Math.floor(Math.sin(seed + userHash + CONFIG.seedOffsetX) * (container.clientWidth - CONFIG.maxImageDimension)) % (container.clientWidth - CONFIG.maxImageDimension);
+        const randY = Math.floor(Math.sin(seed + userHash + CONFIG.seedOffsetY) * (container.clientHeight - CONFIG.maxImageDimension)) % (container.clientHeight - CONFIG.maxImageDimension);
 
         const wrapper = document.createElement("div");
         wrapper.className = SELECTORS.submissionWrapper;
         wrapper.style.left = `${Math.abs(randX)}px`;
         wrapper.style.top = `${Math.abs(randY)}px`;
-        wrapper.style.zIndex = Math.abs(Math.floor(Math.sin(seed + i + CONFIG.seedOffsetZ) * CONFIG.positionVariance)) % CONFIG.maxZIndex;
+        wrapper.style.zIndex = Math.abs(Math.floor(Math.sin(seed + userHash + CONFIG.seedOffsetZ) * CONFIG.positionVariance)) % CONFIG.maxZIndex;
 
         const img = document.createElement("img");
         img.src = sub.imageData;
