@@ -49,6 +49,7 @@ const SELECTORS = {
 
 let currentPromptId = "";
 let currentPrompts = [];
+let cachedSubmissions = {};
 const sortDefaults = {
     id: "ascending",
     popular: "descending"
@@ -260,102 +261,115 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax),
                     console.warn(`No submissions found for prompt ${promptId}.`);
                     return;
                 }
-
-                // Group submissions by username
-                const grouped = {};
-                submissions.forEach((sub) => {
-                    if (!grouped[sub.username]) grouped[sub.username] = [];
-                    grouped[sub.username].push(sub);
-                });
-
-                const usernames = Object.keys(grouped);
-
-                usernames.forEach((username, i) => {
-                    const userSubs = grouped[username];
-
-                    // Deterministically select a submission per user
-                    const randIndex = Math.floor(Math.sin(seed + i) * CONFIG.positionVariance) % userSubs.length;
-                    const sub = userSubs[Math.abs(randIndex)];
-
-                    // Randomize position for each submission
-                    const randX = Math.floor(Math.sin(seed + i + CONFIG.seedOffsetX) * (container.clientWidth - CONFIG.maxImageDimension)) % (container.clientWidth - CONFIG.maxImageDimension);
-                    const randY = Math.floor(Math.sin(seed + i + CONFIG.seedOffsetY) * (container.clientHeight - CONFIG.maxImageDimension)) % (container.clientHeight - CONFIG.maxImageDimension);
-
-                    const wrapper = document.createElement("div");
-                    wrapper.className = SELECTORS.submissionWrapper;
-                    wrapper.style.left = `${Math.abs(randX)}px`;
-                    wrapper.style.top = `${Math.abs(randY)}px`;
-                    wrapper.style.zIndex = Math.abs(Math.floor(Math.sin(seed + i + CONFIG.seedOffsetZ) * CONFIG.positionVariance)) % CONFIG.maxZIndex;
-
-                    const img = document.createElement("img");
-                    img.src = sub.imageData;
-                    img.ondragstart = () => false;
-                    img.alt = sub.caption || sub.username || "User submission";
-
-                    const caption = document.createElement("div");
-                    caption.className = SELECTORS.caption;
-                    caption.textContent = sub.caption ? `${sub.username}: ${sub.caption}` : sub.username;
-
-                    // Set caption alignment and position based on image position
-                    const containerMidpoint = container.clientWidth / 2;
-                    const wrapperX = Math.abs(randX);
-                    if (wrapperX < containerMidpoint) {
-                        caption.classList.add("caption-left");
-                    } else {
-                        caption.classList.add("caption-right");
-                    }
-
-                    wrapper.appendChild(img);
-                    wrapper.appendChild(caption);
-                    container.appendChild(wrapper);
-
-                    // Make wrapper draggable (mouse)
-                    let offsetX, offsetY;
-
-                    wrapper.addEventListener("mousedown", (e) => {
-                        offsetX = e.clientX - wrapper.offsetLeft;
-                        offsetY = e.clientY - wrapper.offsetTop;
-
-                        function onMouseMove(e) {
-                            wrapper.style.left = `${e.clientX - offsetX}px`;
-                            wrapper.style.top = `${e.clientY - offsetY}px`;
-                        }
-
-                        function onMouseUp() {
-                            document.removeEventListener("mousemove", onMouseMove);
-                            document.removeEventListener("mouseup", onMouseUp);
-                        }
-
-                        document.addEventListener("mousemove", onMouseMove);
-                        document.addEventListener("mouseup", onMouseUp);
-                    });
-
-                    // Make wrapper draggable (touch)
-                    wrapper.addEventListener("touchstart", (e) => {
-                        const touch = e.touches[0];
-                        offsetX = touch.clientX - wrapper.offsetLeft;
-                        offsetY = touch.clientY - wrapper.offsetTop;
-
-                        function onTouchMove(e) {
-                            const touch = e.touches[0];
-                            wrapper.style.left = `${touch.clientX - offsetX}px`;
-                            wrapper.style.top = `${touch.clientY - offsetY}px`;
-                        }
-
-                        function onTouchEnd() {
-                            document.removeEventListener("touchmove", onTouchMove);
-                            document.removeEventListener("touchend", onTouchEnd);
-                        }
-
-                        document.addEventListener("touchmove", onTouchMove);
-                        document.addEventListener("touchend", onTouchEnd);
-                    });
-                });
+                cachedSubmissions[promptId] = submissions;
+                renderSubmissions(submissions, promptId, seed);
             })
             .catch(err => {
                 console.error("Failed to load submissions:", err);
             });
+    } else {
+        const cached = cachedSubmissions[promptId];
+        if (Array.isArray(cached)) {
+            renderSubmissions(cached, promptId, seed);
+        } else {
+            console.warn(`No cached submissions available for prompt ${promptId}.`);
+        }
     }
+}
+
+function renderSubmissions(submissions, promptId, seed) {
+    const container = document.getElementById(SELECTORS.submissionsContainer);
+    container.innerHTML = "";
+    // Group submissions by username
+    const grouped = {};
+    submissions.forEach((sub) => {
+        if (!grouped[sub.username]) grouped[sub.username] = [];
+        grouped[sub.username].push(sub);
+    });
+
+    const usernames = Object.keys(grouped);
+
+    usernames.forEach((username, i) => {
+        const userSubs = grouped[username];
+
+        // Deterministically select a submission per user
+        const randIndex = Math.floor(Math.sin(seed + i) * CONFIG.positionVariance) % userSubs.length;
+        const sub = userSubs[Math.abs(randIndex)];
+
+        // Randomize position for each submission
+        const randX = Math.floor(Math.sin(seed + i + CONFIG.seedOffsetX) * (container.clientWidth - CONFIG.maxImageDimension)) % (container.clientWidth - CONFIG.maxImageDimension);
+        const randY = Math.floor(Math.sin(seed + i + CONFIG.seedOffsetY) * (container.clientHeight - CONFIG.maxImageDimension)) % (container.clientHeight - CONFIG.maxImageDimension);
+
+        const wrapper = document.createElement("div");
+        wrapper.className = SELECTORS.submissionWrapper;
+        wrapper.style.left = `${Math.abs(randX)}px`;
+        wrapper.style.top = `${Math.abs(randY)}px`;
+        wrapper.style.zIndex = Math.abs(Math.floor(Math.sin(seed + i + CONFIG.seedOffsetZ) * CONFIG.positionVariance)) % CONFIG.maxZIndex;
+
+        const img = document.createElement("img");
+        img.src = sub.imageData;
+        img.ondragstart = () => false;
+        img.alt = sub.caption || sub.username || "User submission";
+
+        const caption = document.createElement("div");
+        caption.className = SELECTORS.caption;
+        caption.textContent = sub.caption ? `${sub.username}: ${sub.caption}` : sub.username;
+
+        // Set caption alignment and position based on image position
+        const containerMidpoint = container.clientWidth / 2;
+        const wrapperX = Math.abs(randX);
+        if (wrapperX < containerMidpoint) {
+            caption.classList.add("caption-left");
+        } else {
+            caption.classList.add("caption-right");
+        }
+
+        wrapper.appendChild(img);
+        wrapper.appendChild(caption);
+        container.appendChild(wrapper);
+
+        // Make wrapper draggable (mouse)
+        let offsetX, offsetY;
+
+        wrapper.addEventListener("mousedown", (e) => {
+            offsetX = e.clientX - wrapper.offsetLeft;
+            offsetY = e.clientY - wrapper.offsetTop;
+
+            function onMouseMove(e) {
+                wrapper.style.left = `${e.clientX - offsetX}px`;
+                wrapper.style.top = `${e.clientY - offsetY}px`;
+            }
+
+            function onMouseUp() {
+                document.removeEventListener("mousemove", onMouseMove);
+                document.removeEventListener("mouseup", onMouseUp);
+            }
+
+            document.addEventListener("mousemove", onMouseMove);
+            document.addEventListener("mouseup", onMouseUp);
+        });
+
+        // Make wrapper draggable (touch)
+        wrapper.addEventListener("touchstart", (e) => {
+            const touch = e.touches[0];
+            offsetX = touch.clientX - wrapper.offsetLeft;
+            offsetY = touch.clientY - wrapper.offsetTop;
+
+            function onTouchMove(e) {
+                const touch = e.touches[0];
+                wrapper.style.left = `${touch.clientX - offsetX}px`;
+                wrapper.style.top = `${touch.clientY - offsetY}px`;
+            }
+
+            function onTouchEnd() {
+                document.removeEventListener("touchmove", onTouchMove);
+                document.removeEventListener("touchend", onTouchEnd);
+            }
+
+            document.addEventListener("touchmove", onTouchMove);
+            document.addEventListener("touchend", onTouchEnd);
+        });
+    });
 }
 
 // Close the submission modal and reset form state
@@ -459,9 +473,9 @@ function handleSortById() {
     lastSortKey = "id";
 
     const sorted = currentPrompts.slice().sort((a, b) => {
-        return sortDirections.id === "ascending"
-            ? a.id.localeCompare(b.id)
-            : b.id.localeCompare(a.id);
+        return sortDirections.id === "ascending" ?
+            a.id.localeCompare(b.id) :
+            b.id.localeCompare(a.id);
     });
 
     updateSortIndicators("id");
