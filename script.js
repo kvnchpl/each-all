@@ -10,6 +10,7 @@ const CONFIG = {
     promptsListPath: "prompts.json",
     promptDataFolder: "prompts",
     maxImageDimension: 200,
+    maxImageRenderDimension: 100,
     defaultImageQuality: 0.5,
     submitEndpoint: "/.netlify/functions/submitImage",
     positionVariance: 10000,
@@ -241,18 +242,18 @@ function renderSubmissions(submissions, promptId, seed) {
 
         // Deterministically select a submission per user
         const userHash = hashString(username);
-        const randIndex = Math.abs(Math.floor(Math.sin(seed + userHash) * CONFIG.positionVariance)) % userSubs.length;
-        const sub = userSubs[randIndex];
 
-        // Randomize position for each submission using seed, userHash, and offset
-        const randX = Math.floor(Math.sin(seed + userHash + CONFIG.seedOffsetX) * (container.clientWidth - CONFIG.maxImageDimension)) % (container.clientWidth - CONFIG.maxImageDimension);
-        const randY = Math.floor(Math.sin(seed + userHash + CONFIG.seedOffsetY) * (container.clientHeight - CONFIG.maxImageDimension)) % (container.clientHeight - CONFIG.maxImageDimension);
+        const rng = mulberry32(seed + userHash);
+        const randIndex = Math.floor(rng() * userSubs.length);
+        const randX = Math.floor(rng() * (container.clientWidth - CONFIG.maxImageRenderDimension));
+        const randY = Math.floor(rng() * (container.clientHeight - CONFIG.maxImageRenderDimension));
+        const zIndex = Math.floor(rng() * CONFIG.maxZIndex);
 
         const wrapper = document.createElement("div");
         wrapper.className = SELECTORS.submissionWrapper;
-        wrapper.style.left = `${Math.abs(randX)}px`;
-        wrapper.style.top = `${Math.abs(randY)}px`;
-        wrapper.style.zIndex = Math.abs(Math.floor(Math.sin(seed + userHash + CONFIG.seedOffsetZ) * CONFIG.positionVariance)) % CONFIG.maxZIndex;
+        wrapper.style.left = `${randX}px`;
+        wrapper.style.top = `${randY}px`;
+        wrapper.style.zIndex = zIndex;
 
         const img = document.createElement("img");
         img.src = sub.imageData;
@@ -354,8 +355,9 @@ function handleRandomizeSeed() {
 
 // Deterministically shuffle an array using Math.sin() and a seed
 function shuffleArray(array, seed) {
+    const rng = mulberry32(seed);
     for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.abs(Math.floor(Math.sin(seed + i) * CONFIG.positionVariance)) % (i + 1);
+        const j = Math.floor(rng() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
     }
 }
@@ -363,6 +365,16 @@ function shuffleArray(array, seed) {
 // Generate a random seed for image positioning and submission display
 function generateRandomSeed() {
     return Math.floor(Math.random() * CONFIG.seedMax);
+}
+
+// Simple PRNG based on the Mulberry32 algorithm
+function mulberry32(seed) {
+    return function () {
+        seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+        let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    }
 }
 
 // Simple string hashing function for consistent pseudo-randomness
