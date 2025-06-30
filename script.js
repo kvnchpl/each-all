@@ -288,6 +288,13 @@ function openPrompt(promptId, seed = Math.floor(Math.random() * CONFIG.seedMax),
 function renderSubmissions(submissions, promptId, seed) {
     const container = document.getElementById(SELECTORS.submissionsContainer);
     container.innerHTML = "";
+
+    // Show a message if there are no submissions
+    if (!Array.isArray(submissions) || submissions.length === 0) {
+        container.innerHTML = "<div>no submissions yet — be the first to add one!</div>";
+        return;
+    }
+
     // Group submissions by username
     const grouped = {};
     submissions.forEach((sub) => {
