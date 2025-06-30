@@ -139,7 +139,7 @@ async function resizeAndCompressImage(file, quality = CONFIG.defaultImageQuality
     });
 }
 
-/* FORM SUBMISSION HANDLER */
+/* IMAGE SUBMISSION */
 
 // Handle image form submission: validate, compress, and send to backend
 async function submitImage(promptId, fileInput, captionInput) {
@@ -462,7 +462,7 @@ function handleSortById() {
 
 /* INITIALIZATION ON PAGE LOAD */
 
-// Main page initialization logic on DOMContentLoaded
+// Main page initialization logic
 document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
     const promptId = urlParams.get("prompt");
@@ -510,6 +510,13 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById(SELECTORS.aboutModal).classList.remove("visible");
     });
 
+    // Show filename preview when a file is selected in the image input
+    document.getElementById(SELECTORS.imageInput).addEventListener("change", (event) => {
+        const file = event.target.files[0];
+        const previewContainer = document.getElementById(SELECTORS.filenamePreview);
+        previewContainer.textContent = file ? file.name : "";
+    });
+
     // Tap-to-toggle captions on mobile: only one visible at a time, tap outside hides
     if (window.innerWidth <= 768) {
         let currentlyVisibleCaption = null;
@@ -540,13 +547,4 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-});
-
-/* FILENAME PREVIEW HANDLER */
-
-// Show filename preview when a file is selected in the image input
-document.getElementById(SELECTORS.imageInput).addEventListener("change", (event) => {
-    const file = event.target.files[0];
-    const previewContainer = document.getElementById(SELECTORS.filenamePreview);
-    previewContainer.textContent = file ? file.name : "";
 });
