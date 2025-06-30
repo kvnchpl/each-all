@@ -61,52 +61,6 @@ let sortDirections = {
 let sortIndicators = {};
 let lastSortKey = null;
 
-// ==== USERNAME MANAGEMENT ====
-
-// Generate a random username and save it if none exists
-function getUsername() {
-    let username = localStorage.getItem("eachAllUsername");
-    if (!username) {
-        username = "user_" + Math.random().toString(36).substring(2, 10);
-        localStorage.setItem("eachAllUsername", username);
-    }
-    return username;
-}
-
-// Set the username in localStorage
-function setUsername(newUsername) {
-    localStorage.setItem("eachAllUsername", newUsername);
-}
-
-// ==== IMAGE RESIZING & COMPRESSION ====
-
-// Resize and compress the uploaded image file, returning a DataURL
-async function resizeAndCompressImage(file, quality = CONFIG.defaultImageQuality, maxDim = CONFIG.maxImageDimension) {
-    const imageBitmap = await createImageBitmap(file);
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-
-    // Calculate scale to fit within maxDim
-    const scale = Math.min(maxDim / imageBitmap.width, maxDim / imageBitmap.height, 1);
-    canvas.width = imageBitmap.width * scale;
-    canvas.height = imageBitmap.height * scale;
-
-    ctx.drawImage(imageBitmap, 0, 0, canvas.width, canvas.height);
-
-    // Convert canvas to DataURL asynchronously
-    return new Promise((resolve) => {
-        canvas.toBlob(
-            (blob) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.readAsDataURL(blob);
-            },
-            "image/jpeg",
-            quality
-        );
-    });
-}
-
 // ==== IMAGE SUBMISSION HANDLING ====
 
 // Handle image form submission: validate, compress, and send to backend
@@ -190,6 +144,33 @@ function handleSubmit() {
     const fileInput = form.elements[SELECTORS.imageInput];
     const captionInput = form.elements[SELECTORS.captionInput];
     submitImage(currentPromptId, fileInput, captionInput);
+}
+
+// Resize and compress the uploaded image file, returning a DataURL
+async function resizeAndCompressImage(file, quality = CONFIG.defaultImageQuality, maxDim = CONFIG.maxImageDimension) {
+    const imageBitmap = await createImageBitmap(file);
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    // Calculate scale to fit within maxDim
+    const scale = Math.min(maxDim / imageBitmap.width, maxDim / imageBitmap.height, 1);
+    canvas.width = imageBitmap.width * scale;
+    canvas.height = imageBitmap.height * scale;
+
+    ctx.drawImage(imageBitmap, 0, 0, canvas.width, canvas.height);
+
+    // Convert canvas to DataURL asynchronously
+    return new Promise((resolve) => {
+        canvas.toBlob(
+            (blob) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.readAsDataURL(blob);
+            },
+            "image/jpeg",
+            quality
+        );
+    });
 }
 
 // ==== PROMPT MODAL HANDLING ====
@@ -485,6 +466,23 @@ function handleSortById() {
     renderPromptTiles(sorted);
 }
 
+// ==== USERNAME MANAGEMENT ====
+
+// Generate a random username and save it if none exists
+function getUsername() {
+    let username = localStorage.getItem("eachAllUsername");
+    if (!username) {
+        username = "user_" + Math.random().toString(36).substring(2, 10);
+        localStorage.setItem("eachAllUsername", username);
+    }
+    return username;
+}
+
+// Set the username in localStorage
+function setUsername(newUsername) {
+    localStorage.setItem("eachAllUsername", newUsername);
+}
+
 // ==== INITIALIZATION ====
 
 // Main page initialization logic
@@ -517,7 +515,7 @@ document.addEventListener("DOMContentLoaded", () => {
         setUsername(usernameInput.value);
     });
 
-    // ==== EVENT LISTENERS ====
+    /* EVENT LISTENERS */
 
     // Handle image submission form
     document.getElementById(SELECTORS.submissionForm).addEventListener("submit", (e) => {
