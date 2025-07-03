@@ -270,6 +270,10 @@ button {
     margin: 0;
 }
 
+#about-content a {
+    color: var(--text-color-light)
+}
+
 #about-button {
     color: var(--highlight-color);
     cursor: pointer;
@@ -340,7 +344,7 @@ button {
     }
 
     #about-content {
-    padding: var(--padding-base);
-    max-width: 70vw;
-}
+        padding: var(--padding-base);
+        max-width: 70vw;
+    }
 }
