@@ -88,8 +88,8 @@ button {
     position: fixed;
     top: 0;
     left: 0;
-    height: 100svh;
-    width: 100svw;
+    height: 100dvh;
+    width: 100dvw;
     background-color: var(--bg-color-light);
     color: var(--text-color-dark);
     z-index: 1000;
@@ -113,8 +113,8 @@ button {
     flex-direction: column;
     justify-content: space-between;
     height: 100%;
-    width: 15svw;
-    max-width: 15svw;
+    width: 15dvw;
+    max-width: 15dvw;
     padding: var(--padding-base);
     background-color: var(--bg-color-dark);
 }
@@ -259,7 +259,7 @@ button {
     background-color: var(--bg-color-dark);
     color: var(--text-color-light);
     padding: var(--padding-large);
-    max-width: 50svw;
+    max-width: 50dvw;
     margin: 0 auto;
 }
 
@@ -302,7 +302,7 @@ button {
 
 @media (max-width: 768px) {
     .modal-content {
-        width: 100svw;
+        width: 100dvw;
         max-width: none;
         height: auto;
         flex-direction: column;
@@ -318,7 +318,7 @@ button {
 
     #submissions-container {
         width: 100%;
-        height: 100svh;
+        height: 100dvh;
         overflow: auto;
         position: relative;
     }
@@ -336,7 +336,7 @@ button {
         display: block;
         position: relative;
         z-index: 1001;
-        width: 100svw;
+        width: 100dvw;
         padding: var(--padding-small);
         background-color: var(--bg-color-dark);
         color: var(--text-color-light);
@@ -345,6 +345,6 @@ button {
 
     #about-content {
         padding: var(--padding-base);
-        max-width: 70svw;
+        max-width: 70dvw;
     }
 }
