@@ -571,14 +571,21 @@ document.addEventListener("DOMContentLoaded", () => {
     // Sort prompts by ID
     document.getElementById(SELECTORS.sortIdButton).addEventListener("click", handleSortById);
 
-    // Open about modal
+    // Open about modal button
     document.getElementById(SELECTORS.aboutButton).addEventListener("click", () => {
         document.getElementById(SELECTORS.aboutModal).classList.add("visible");
     });
 
-    // Close about modal
+    // Close about modal button
     document.getElementById(SELECTORS.aboutClose).addEventListener("click", () => {
         document.getElementById(SELECTORS.aboutModal).classList.remove("visible");
+    });
+
+    // Close about modal by clicking outside of the modal content window, i.e. the overlay
+    document.getElementById(SELECTORS.aboutModal).addEventListener("click", (e) => {
+        if (e.target.id === SELECTORS.aboutModal) {
+            document.getElementById(SELECTORS.aboutModal).classList.remove("visible");
+        }
     });
 
     // Show selected file name in preview
@@ -592,7 +599,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!window.location.search) {
         document.getElementById("about-modal").classList.add("visible");
     }
-    
+
     // Tap-to-toggle captions on mobile: only one visible at a time, tap outside hides
     if (window.innerWidth <= 768) {
         let currentlyVisibleCaption = null;
