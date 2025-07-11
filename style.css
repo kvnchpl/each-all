@@ -308,6 +308,10 @@ button {
     display: none;
 }
 
+.bottom-spacer {
+    margin-bottom: var(--padding-large);
+}
+
 @media (max-width: 768px) {
     .modal-content {
         width: 100dvw;
