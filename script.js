@@ -588,9 +588,11 @@ document.addEventListener("DOMContentLoaded", () => {
         previewContainer.textContent = file ? file.name : "";
     });
 
-    // About modal open by default on page load
-    document.getElementById("about-modal").classList.add("visible");
-
+    // About modal open by default on page load for the homepage
+    if (!window.location.search) {
+        document.getElementById("about-modal").classList.add("visible");
+    }
+    
     // Tap-to-toggle captions on mobile: only one visible at a time, tap outside hides
     if (window.innerWidth <= 768) {
         let currentlyVisibleCaption = null;
