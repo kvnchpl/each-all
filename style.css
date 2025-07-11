@@ -255,6 +255,10 @@ button {
     padding: var(--padding-large);
 }
 
+#about-modal .modal-content {
+    width: auto;
+}
+
 #about-content {
     background-color: var(--bg-color-dark);
     color: var(--text-color-light);
