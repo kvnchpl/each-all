@@ -215,10 +215,11 @@ function openPrompt(promptId, seed = generateRandomSeed(), skipFetch = false) {
             });
     } else {
         const cached = cachedSubmissions[promptId];
-        if (Array.isArray(cached)) {
+        if (Array.isArray(cached) && cached.length > 0) {
             renderSubmissions(cached, promptId, seed);
         } else {
-            console.warn(`No cached submissions available for prompt ${promptId}.`);
+            console.warn(`No cached submissions available or prompt is empty for prompt ${promptId}.`);
+            container.innerHTML = "<div class='no-submissions'>no submissions yet – be the first to add one!</div>";
         }
     }
 }
