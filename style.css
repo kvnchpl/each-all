@@ -287,8 +287,16 @@ button {
     color: var(--text-color-light)
 }
 
+#about-content ul {
+    list-style: none;
+}
+
 #about-content li {
     text-align: left;
+}
+
+#about-content li::before {
+    content: "* ";
 }
 
 #about-button {
