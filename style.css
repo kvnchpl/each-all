@@ -322,6 +322,7 @@ button {
         width: 100dvw;
         max-width: none;
         height: auto;
+        max-height: 100dvh;
         flex-direction: column;
         gap: 0;
     }
