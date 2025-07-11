@@ -263,23 +263,20 @@ button {
     margin: 0 auto;
 }
 
-#about-content p {
+#about-content p,
+#about-content ul,
+#about-content li {
     font-size: var(--font-size-base);
     line-height: 1.5;
-    text-align: justify;
     margin: 0;
+}
+
+#about-content p {
+    text-align: justify;
 }
 
 #about-content a {
     color: var(--text-color-light)
-}
-
-#about-content ul {
-    margin: 0;
-}
-
-#about-content li {
-    text-align: left;
 }
 
 #about-button {
