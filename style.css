@@ -275,6 +275,10 @@ button {
     text-align: justify;
 }
 
+#about-content p.top-spacer {
+    margin-top: var(--padding-base);
+}
+
 #about-content p.bottom-spacer {
     margin-bottom: var(--padding-large);
 }
