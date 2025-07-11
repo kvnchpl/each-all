@@ -570,12 +570,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // Sort prompts by ID
     document.getElementById(SELECTORS.sortIdButton).addEventListener("click", handleSortById);
 
-    // Open About modal
+    // Open about modal
     document.getElementById(SELECTORS.aboutButton).addEventListener("click", () => {
         document.getElementById(SELECTORS.aboutModal).classList.add("visible");
     });
 
-    // Close About modal
+    // Close about modal
     document.getElementById(SELECTORS.aboutClose).addEventListener("click", () => {
         document.getElementById(SELECTORS.aboutModal).classList.remove("visible");
     });
@@ -586,6 +586,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const previewContainer = document.getElementById(SELECTORS.filenamePreview);
         previewContainer.textContent = file ? file.name : "";
     });
+
+    // About modal open by default on page load
+    document.getElementById("about-modal").classList.add("visible");
 
     // Tap-to-toggle captions on mobile: only one visible at a time, tap outside hides
     if (window.innerWidth <= 768) {
