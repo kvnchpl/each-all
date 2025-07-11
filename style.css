@@ -336,7 +336,7 @@ button {
 
     #submissions-container {
         width: 100%;
-        height: 100dvh;
+        min-height: 100dvh;
         overflow: auto;
         position: relative;
     }
