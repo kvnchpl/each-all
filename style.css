@@ -288,6 +288,7 @@ button {
 }
 
 #about-content ul {
+    padding-inline-start: var(--padding-base);
     list-style: none;
 }
 
