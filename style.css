@@ -275,6 +275,10 @@ button {
     text-align: justify;
 }
 
+#about-content p.bottom-spacer {
+    margin-bottom: var(--padding-large);
+}
+
 #about-content a {
     color: var(--text-color-light)
 }
@@ -307,10 +311,6 @@ button {
 
 #toggle-header {
     display: none;
-}
-
-.bottom-spacer {
-    margin-bottom: var(--padding-large);
 }
 
 @media (max-width: 768px) {
