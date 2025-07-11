@@ -274,6 +274,10 @@ button {
     color: var(--text-color-light)
 }
 
+#about-content li {
+    text-align: left;
+}
+
 #about-button {
     color: var(--highlight-color);
     cursor: pointer;
