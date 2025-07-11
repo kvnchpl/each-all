@@ -259,7 +259,7 @@ button {
     background-color: var(--bg-color-dark);
     color: var(--text-color-light);
     padding: var(--padding-large);
-    max-width: 50dvw;
+    max-width: 60dvw;
     margin: 0 auto;
 }
 
@@ -272,6 +272,10 @@ button {
 
 #about-content a {
     color: var(--text-color-light)
+}
+
+#about-content ul {
+    margin: 0;
 }
 
 #about-content li {
