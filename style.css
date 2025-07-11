@@ -360,8 +360,14 @@ button {
         border: none;
     }
 
+    #about-modal {
+        padding: 0;
+    }
+
     #about-content {
         padding: var(--padding-base);
         max-width: 70dvw;
+        max-height: 100dvh;
+        overflow-y: auto;
     }
 }
