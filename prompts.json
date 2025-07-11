@@ -18,5 +18,9 @@
     {
         "id": "005",
         "prompt": "The sound of rain"
+    },
+    {
+        "id": "006",
+        "prompt": "Truth changing overnight"
     }
 ]
