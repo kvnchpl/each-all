@@ -367,7 +367,7 @@ button {
     #about-content {
         padding: var(--padding-base);
         max-width: 70dvw;
-        max-height: 100dvh;
+        max-height: 80dvh;
         overflow-y: auto;
     }
 }
