@@ -596,8 +596,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // About modal open by default on page load for the homepage
-    if (!window.location.search) {
-        document.getElementById("about-modal").classList.add("visible");
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has("prompt") && !params.has("seed")) {
+        document.getElementById(SELECTORS.aboutModal).classList.add("visible");
     }
 
     // Tap-to-toggle captions on mobile: only one visible at a time, tap outside hides
