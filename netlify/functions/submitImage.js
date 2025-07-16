@@ -131,10 +131,12 @@ exports.handler = async (event) => {
                 to: process.env.NOTIFY_EMAIL,
                 subject: `EACH ALL: new submission to prompt ${promptId}`,
                 html: `
-              <p><strong>${username}</strong> submitted an image to prompt <strong>${promptId}</strong>.</p>
-              ${caption ? `<p>caption: ${caption}</p>` : ""}
-              <p>submitted at: ${submittedAt}</p>
-            `,
+      <p><strong>${username}</strong> submitted an image to prompt 
+         <strong><a href="https://each-all.netlify.app/?prompt=${promptId}" target="_blank" rel="noopener noreferrer">${promptId}</a></strong>.
+      </p>
+      ${caption ? `<p>caption: ${caption}</p>` : ""}
+      <p>submitted at: ${submittedAt}</p>
+    `,
             });
         } catch (emailError) {
             console.error("Failed to send notification email:", emailError);
