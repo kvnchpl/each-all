@@ -138,6 +138,8 @@ exports.handler = async (event) => {
   </p>
   ${caption ? `<p>caption: ${caption}</p>` : ""}
   <p>submitted at: ${submittedAt}</p>
+  <p><strong>Submitted image:</strong></p>
+  <img src="${imageData}" alt="Submitted image by ${username}" style="max-width:200px; height:auto; border:1px solid #ccc;"/>
 `,
             });
         } catch (emailError) {
