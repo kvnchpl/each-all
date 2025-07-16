@@ -133,16 +133,13 @@ exports.handler = async (event) => {
                 to: process.env.NOTIFY_EMAIL,
                 subject: `EACH ALL: new submission to prompt ${promptId}`,
                 html: `
-    <p><strong>${username}</strong> submitted an image to prompt 
-       <strong><a href="https://each-all.netlify.app/?prompt=${promptId}&seed=${seed}" target="_blank" rel="noopener noreferrer">${promptId}</a></strong>.
-    </p>
+    <p><strong>${username}</strong> submitted an image to <strong><a href="https://each-all.netlify.app/?prompt=${promptId}&seed=${seed}" target="_blank" rel="noopener noreferrer">prompt ${promptId}</a></strong>.</p>
     ${caption ? `<p>caption: ${caption}</p>` : ""}
     <p>submitted at: ${submittedAt}</p>
-    <p><strong>Submitted image is attached below.</strong></p>
   `,
                 attachments: [
                     {
-                        filename: `submission-${promptId}-${username}.jpg`,
+                        filename: `${promptId}-${username}.jpg`,
                         content: imageData.split(",")[1], // Strip "data:image/jpeg;base64,"
                         encoding: "base64"
                     }
