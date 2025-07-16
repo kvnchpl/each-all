@@ -102,12 +102,16 @@ async function submitImage(promptId, fileInput, captionInput) {
         }
         const caption = captionInput.value;
 
+        // Save seed from URL or generate a random one
+        const seed = new URLSearchParams(window.location.search).get("seed") || generateRandomSeed();
+
         // Prepare payload for submission
         const payload = {
             username,
             promptId,
             caption,
-            imageData
+            imageData,
+            seed
         };
 
         const res = await fetch(CONFIG.submitEndpoint, {
