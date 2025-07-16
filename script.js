@@ -526,6 +526,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const promptId = urlParams.get("prompt");
     const seed = urlParams.get("seed");
 
+    // If a seed is present without a prompt, clean up the URL
+    if (!promptId && seed) {
+        const url = new URL(window.location);
+        url.searchParams.delete("seed");
+        window.history.replaceState({}, "", url.pathname);
+    }
+
     // Load prompt data and initialize grid
     fetch(CONFIG.promptsListPath)
         .then((res) => res.json())
