@@ -605,6 +605,21 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById(SELECTORS.aboutModal).classList.add("visible");
     }
 
+    // Handle browser navigation to maintain modal state
+    window.addEventListener("popstate", () => {
+        const params = new URLSearchParams(window.location.search);
+        const promptId = params.get("prompt");
+        const seed = params.get("seed");
+
+        if (promptId) {
+            // Reopen the modal when navigating back/forward to a prompt URL
+            openPrompt(promptId, seed ? parseInt(seed) : undefined, true);
+        } else {
+            // Close modal when navigating back to the grid view
+            closeModal();
+        }
+    });
+
     // Tap-to-toggle captions on mobile: only one visible at a time, tap outside hides
     if (window.innerWidth <= 768) {
         let currentlyVisibleCaption = null;
