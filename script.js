@@ -126,11 +126,10 @@ async function submitImage(promptId, fileInput, captionInput) {
         if (result.success) {
             alert("thanks for sharing! your image has been submitted. check back in a minute or so to see it live.");
 
-            // Reset form after successful submission
+            // Reset only file and caption fields (leave username intact)
             fileInput.value = "";
+            captionInput.value = "";
             document.getElementById(SELECTORS.filenamePreview).textContent = "";
-            const form = document.getElementById(SELECTORS.submissionForm);
-            form.reset();
         } else {
             alert("uh oh... something went wrong with your submission. " + (result.error || "please try again later."));
         }
