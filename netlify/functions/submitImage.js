@@ -124,7 +124,7 @@ exports.handler = async (event) => {
 
             const submittedAt = new Intl.DateTimeFormat("en-US", {
                 timeZone: "America/New_York",
-                dateStyle: "full",
+                dateStyle: "long",
                 timeStyle: "short",
             }).format(new Date()).toLowerCase();
 
@@ -135,7 +135,7 @@ exports.handler = async (event) => {
                 html: `
     <p><strong>${username}</strong> submitted an image to <strong><a href="https://each-all.netlify.app/?prompt=${promptId}&seed=${seed}" target="_blank" rel="noopener noreferrer">prompt ${promptId}</a></strong></p>
     ${caption ? `<p>caption: ${caption}</p>` : ""}
-    <p>submitted at: ${submittedAt}</p>
+    <p>submitted on: ${submittedAt}</p>
   `,
                 attachments: [
                     {
