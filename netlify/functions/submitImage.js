@@ -133,7 +133,7 @@ exports.handler = async (event) => {
                 to: process.env.NOTIFY_EMAIL,
                 subject: `EACH ALL: new submission to prompt ${promptId}`,
                 html: `
-    <p><strong>${username}</strong> submitted an image to <strong><a href="https://each-all.netlify.app/?prompt=${promptId}&seed=${seed}" target="_blank" rel="noopener noreferrer">prompt ${promptId}</a></strong>.</p>
+    <p><strong>${username}</strong> submitted an image to <strong><a href="https://each-all.netlify.app/?prompt=${promptId}&seed=${seed}" target="_blank" rel="noopener noreferrer">prompt ${promptId}</a></strong></p>
     ${caption ? `<p>caption: ${caption}</p>` : ""}
     <p>submitted at: ${submittedAt}</p>
   `,
