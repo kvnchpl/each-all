@@ -539,7 +539,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Open prompt modal after currentPrompts is set
             if (promptId) {
-                openPrompt(promptId, seed ? parseInt(seed) : undefined);
+                let finalSeed = seed ? parseInt(seed) : generateRandomSeed();
+
+                // If no seed was in the URL, add it
+                if (!seed) {
+                    const url = new URL(window.location);
+                    url.searchParams.set("seed", finalSeed);
+                    window.history.replaceState({}, "", url);
+                }
+
+                openPrompt(promptId, finalSeed);
             }
         });
 
