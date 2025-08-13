@@ -22,5 +22,21 @@
     {
         "id": "006",
         "prompt": "Truth changing overnight"
+    },
+    {
+        "id": "007",
+        "prompt": "Louder and louder"
+    },
+    {
+        "id": "008",
+        "prompt": "A screenshot you've been holding onto"
+    },
+    {
+        "id": "009",
+        "prompt": "Double image"
+    },
+    {
+        "id": "010",
+        "prompt": "Cardboard and plastic"
     }
 ]
