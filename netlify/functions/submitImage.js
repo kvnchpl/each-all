@@ -116,38 +116,41 @@ exports.handler = async (event) => {
         };
 
         // Send a notification email about the new submission
-        try {
-            const {
-                Resend
-            } = await import('resend');
-            const resend = new Resend(process.env.RESEND_API_KEY);
+        const { Resend } = await import("resend");
 
-            const submittedAt = new Intl.DateTimeFormat("en-US", {
-                timeZone: "America/New_York",
-                dateStyle: "long",
-                timeStyle: "short",
-            }).format(new Date()).toLowerCase();
+if (!process.env.RESEND_API_KEY) {
+    console.error("RESEND_API_KEY is missing.");
+} else if (!process.env.NOTIFY_EMAIL) {
+    console.error("NOTIFY_EMAIL is missing.");
+} else {
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
-            await resend.emails.send({
-                from: process.env.FROM_EMAIL || 'no-reply@resend.dev',
-                to: process.env.NOTIFY_EMAIL,
-                subject: `EACH ALL: new submission to prompt ${promptId}`,
-                html: `
-    <p><strong>${username}</strong> submitted an image to <strong><a href="https://each-all.netlify.app/?prompt=${promptId}&seed=${seed}" target="_blank" rel="noopener noreferrer">prompt ${promptId}</a></strong></p>
-    ${caption ? `<p>caption: ${caption}</p>` : ""}
-    <p>submitted on: ${submittedAt}</p>
-  `,
-                attachments: [
-                    {
-                        filename: `${promptId}-${username}.jpg`,
-                        content: imageData.split(",")[1], // Strip "data:image/jpeg;base64,"
-                        encoding: "base64"
-                    }
-                ]
-            });
-        } catch (emailError) {
-            console.error("Failed to send notification email:", emailError);
-        }
+    const { data, error } = await resend.emails.send({
+        from: process.env.FROM_EMAIL || "no-reply@resend.dev",
+        to: process.env.NOTIFY_EMAIL,
+        subject: `EACH ALL: new submission to prompt ${promptId}`,
+        html: `
+            <p><strong>${username}</strong> submitted an image to
+            <strong><a href="https://each-all.netlify.app/?prompt=${promptId}&seed=${seed}">
+            prompt ${promptId}</a></strong></p>
+            ${caption ? `<p>caption: ${caption}</p>` : ""}
+            <p>submitted on: ${submittedAt}</p>
+        `,
+        attachments: [
+            {
+                filename: `${promptId}-${username}.jpg`,
+                content: imageData.split(",")[1],
+                encoding: "base64"
+            }
+        ]
+    });
+
+    if (error) {
+        console.error("Resend notification failed:", error);
+    } else {
+        console.log("Resend notification sent:", data);
+    }
+}
 
         // Add new submission to the array
         submissions.push(newSubmission);
