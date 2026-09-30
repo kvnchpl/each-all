@@ -116,7 +116,9 @@ exports.handler = async (event) => {
         };
 
         // Send a notification email about the new submission
-        const { Resend } = await import("resend");
+const submittedAt = newSubmission.timestamp;
+
+const { Resend } = await import("resend");
 
 if (!process.env.RESEND_API_KEY) {
     console.error("RESEND_API_KEY is missing.");
