@@ -35,7 +35,7 @@ function clearPreview() {
   previewURL = '';
   $('image-preview').hidden = true;
   $('image-preview').removeAttribute('src');
-  $('filename-preview').textContent = 'no file selected.';
+  $('filename-preview').textContent = 'no file selected';
 }
 function closePrompt(updateHistory = true) {
   loadVersion++;
