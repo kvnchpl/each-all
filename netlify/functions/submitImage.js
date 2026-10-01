@@ -18,11 +18,15 @@ exports.handler = async event => {
     const bytes = await prepareImage(input.bytes, sharp);
     const saved = await saveSubmission(api, repo, branch, input, bytes);
     // Notify only after a successful commit; email failure never rejects a saved image.
+    if (!saved.duplicate && (!env.RESEND_API_KEY || !env.NOTIFY_EMAIL)) {
+      console.error(!env.RESEND_API_KEY ? 'RESEND_API_KEY is missing.' : 'NOTIFY_EMAIL is missing.');
+    }
     if (!saved.duplicate && env.RESEND_API_KEY && env.NOTIFY_EMAIL) {
       try {
         const { Resend } = await import('resend');
         const result = await new Resend(env.RESEND_API_KEY).emails.send(notification(saved.entry, bytes, env));
         if (result.error) console.error('Submission notification failed:', result.error.name);
+        else console.log('Submission notification sent:', result.data?.id);
       } catch { console.error('Submission notification failed.'); }
     }
     return response(200, { success: true, submission: saved.entry, count: saved.count });

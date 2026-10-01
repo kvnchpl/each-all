@@ -77,7 +77,7 @@ function notification(entry, bytes, env) {
   return {
     from: env.FROM_EMAIL || 'no-reply@resend.dev', to: env.NOTIFY_EMAIL,
     subject: `EACH ALL: new submission to prompt ${entry.imagePath.split('/')[1]}`,
-    html: `<p><strong>${escapeHTML(entry.username)}</strong> submitted an image to <a href="${escapeHTML(url.href)}">EACH ALL</a>.</p>${entry.caption ? `<p>caption: ${escapeHTML(entry.caption)}</p>` : ''}`,
+    html: `<p><strong>${escapeHTML(entry.username)}</strong> submitted an image to <a href="${escapeHTML(url.href)}">EACH ALL</a>.</p>${entry.caption ? `<p>caption: ${escapeHTML(entry.caption)}</p>` : ''}<p>submitted on: ${escapeHTML(entry.timestamp)}</p>`,
     attachments: [{ filename: `${entry.id}.jpg`, content: bytes.toString('base64') }]
   };
 }

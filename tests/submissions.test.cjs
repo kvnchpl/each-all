@@ -79,8 +79,9 @@ test('persistent conflicts stop after five attempts and never overwrite head', a
   assert.equal(mock.updates(), 5); assert.equal(mock.files()['prompts/001.json'], undefined);
 });
 test('email escapes contributor text and attaches bytes without a deployed URL', () => {
-  const entry = { id: 'test', imagePath: 'images/001/test.jpg', username: '<script>x</script>', caption: '"<&', seed: 1 };
+  const entry = { id: 'test', imagePath: 'images/001/test.jpg', username: '<script>x</script>', caption: '"<&', seed: 1, timestamp: '2026-10-01T12:00:00.000Z' };
   const email = notification(entry, Buffer.from('image'), { NOTIFY_EMAIL: 'example@example.com' });
+  assert.ok(email.html.includes('submitted on: 2026-10-01T12:00:00.000Z'));
   assert.ok(!email.html.includes('<script>')); assert.ok(email.html.includes('&lt;script&gt;'));
   assert.ok(email.html.includes('&quot;&lt;&amp;')); assert.equal(email.attachments[0].content, Buffer.from('image').toString('base64'));
 });
