@@ -35,7 +35,7 @@ function clearPreview() {
   previewURL = '';
   $('image-preview').hidden = true;
   $('image-preview').removeAttribute('src');
-  $('filename-preview').textContent = '';
+  $('filename-preview').textContent = 'no file selected.';
 }
 function closePrompt(updateHistory = true) {
   loadVersion++;
@@ -93,6 +93,13 @@ function render() {
       const waiting = subs.filter(sub => sub.pending);
       return waiting.at(-1) || subs[Math.floor(rng(currentSeed + hash(name))() * subs.length)];
     });
+  }
+  if (view === 'list') {
+    const shuffle = rng(currentSeed);
+    for (let i = entries.length - 1; i > 0; i--) {
+      const j = Math.floor(shuffle() * (i + 1));
+      [entries[i], entries[j]] = [entries[j], entries[i]];
+    }
   }
   const random = rng(currentSeed);
   for (const sub of entries) {

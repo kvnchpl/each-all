@@ -36,7 +36,7 @@
             <div id="modal-header">
                 <div class="modal-top flex-col">
                     <button id="return-button" type="button" aria-label="Return to prompts" class="modal-button">←</button>
-                    <button id="randomize-button" type="button" aria-label="Shuffle the scrapbook" class="modal-button">*</button>
+                    <button id="randomize-button" type="button" aria-label="Randomize images" class="modal-button">*</button>
                     <div id="prompt-text"></div>
                     <button id="view-button" type="button" class="modal-button" aria-pressed="false">list view</button>
                 </div>
@@ -45,9 +45,14 @@
                         <label for="username-input">username</label>
                         <input type="text" id="username-input" class="modal-input" placeholder="username" maxlength="80" required />
                         <label for="image-input">choose an image (jpg, png, webp)</label>
-                        <input type="file" id="image-input" accept="image/jpeg,image/png,image/webp" required />
+                        <div class="file-picker-row">
+                            <div class="file-picker">
+                                <span aria-hidden="true">browse</span>
+                                <input type="file" id="image-input" accept="image/jpeg,image/png,image/webp" aria-describedby="filename-preview" required />
+                            </div>
+                            <div id="filename-preview">no file selected.</div>
+                        </div>
                         <img id="image-preview" alt="Your selected image" hidden />
-                        <div id="filename-preview"></div>
                         <label for="caption-input">caption (optional)</label>
                         <input type="text" id="caption-input" maxlength="500" class="modal-input"
                             placeholder="add a caption (optional)" />
