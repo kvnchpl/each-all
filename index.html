@@ -15,51 +15,56 @@
     <meta property="og:description"
         content="An open-ended, collaborative image-sharing site with the goal of creating a collective scrapbook of memories, ideas, and feelings." />
     <meta property="og:image" content="https://each-all.netlify.app/og-image.jpg" />
-    <meta property="og:url" content="https://each-all.netlify.app/each-all/" />
+    <meta property="og:url" content="https://each-all.netlify.app/" />
     <meta property="og:type" content="website" />
     <link rel="icon" href="favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-    <h1>EACH ALL<span id="about-button">*</span></h1>
+    <h1>EACH ALL<button id="about-button" type="button" aria-label="About EACH ALL">*</button></h1>
 
     <div id="sort-controls">
-        <div class="interactive-tile" id="sort-popular-button">Popular</div>
-        <div class="interactive-tile" id="sort-id-button">ID</div>
+        <button type="button" class="interactive-tile" id="sort-popular-button">Popular</button>
+        <button type="button" class="interactive-tile" id="sort-id-button">ID</button>
     </div>
 
     <div id="prompt-grid"></div>
 
-    <div id="submission-modal" class="modal">
+    <div id="submission-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="prompt-text" tabindex="-1">
         <div class="modal-content">
             <div id="modal-header">
                 <div class="modal-top flex-col">
-                    <button id="return-button" class="modal-button">←</button>
-                    <button id="randomize-button" class="modal-button">*</button>
+                    <button id="return-button" type="button" aria-label="Return to prompts" class="modal-button">←</button>
+                    <button id="randomize-button" type="button" aria-label="Shuffle the scrapbook" class="modal-button">*</button>
                     <div id="prompt-text"></div>
+                    <button id="view-button" type="button" class="modal-button" aria-pressed="false">list view</button>
                 </div>
                 <div class="modal-bottom flex-col">
                     <form id="submission-form">
-                        <input type="text" id="username-input" class="modal-input" placeholder="username" />
-                        <label for="image-input" id="file-label" class="modal-button">Choose File</label>
-                        <input type="file" id="image-input" accept="image/*" style="display: none;" />
+                        <label for="username-input">username</label>
+                        <input type="text" id="username-input" class="modal-input" placeholder="username" maxlength="80" required />
+                        <label for="image-input">choose an image (jpg, png, webp)</label>
+                        <input type="file" id="image-input" accept="image/jpeg,image/png,image/webp" required />
+                        <img id="image-preview" alt="Your selected image" hidden />
                         <div id="filename-preview"></div>
-                        <input type="text" id="caption-input" class="modal-input"
+                        <label for="caption-input">caption (optional)</label>
+                        <input type="text" id="caption-input" maxlength="500" class="modal-input"
                             placeholder="add a caption (optional)" />
-                        <button id="submit-button" class="modal-button">Submit</button>
+                        <button id="submit-button" type="submit" class="modal-button">Submit</button>
+                        <p id="submission-status" role="status" aria-live="polite" aria-atomic="true"></p>
                     </form>
                 </div>
             </div>
-            <button id="toggle-header" type="button" class="modal-button">↑</button>
-            <div id="submissions-container"></div>
+            <button id="toggle-header" aria-label="Hide submission controls" aria-controls="modal-header" aria-expanded="true" type="button" class="modal-button">↑</button>
+            <div id="submissions-container" aria-label="Images contributed to this prompt"></div>
         </div>
     </div>
 
-    <div id="about-modal" class="modal">
+    <div id="about-modal" class="modal" role="dialog" aria-modal="true" aria-label="About EACH ALL" tabindex="-1">
         <div class="modal-content">
             <div id="about-content" class="flex-col">
-                <button id="about-close" class="modal-button">&#8592;</button>
+                <button id="about-close" type="button" aria-label="Close about" class="modal-button">&#8592;</button>
                 <p class="top-spacer">
                     I created this site <span class="uppercase">EACH ALL</span> as an antidote to an internet that feels
                     increasingly alienating through algorithmic content and performative constructions of digital
@@ -81,11 +86,11 @@
                     <li>Pick an image file (JPG, PNG, WebP) from your device.</li>
                     <li>Feel free to add a caption.</li>
                     <li>Finally, click “Submit.”</li>
-                    <li>Your image will show up on that prompt’s page after about a minute.</li>
+                    <li>Your image appears immediately for you while it is published for everyone.</li>
                 </ul>
                 <p>
                     When viewing a prompt board, you can also drag the images around to remix the layout yourself. Or
-                    click the asterisk button to generate a brand new layout.</p>
+                    click the asterisk button to generate a brand new layout. Switch to list view to browse every contribution, with captions visible.</p>
             </div>
         </div>
     </div>

@@ -10,6 +10,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@octokit/rest": "^22.0.0"
+    "@octokit/rest": "^22.0.0",
+    "resend": "^6.31.0",
+    "sharp": "^0.35.5"
   }
 }

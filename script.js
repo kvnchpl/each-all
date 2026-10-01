@@ -1,668 +1,283 @@
-// script.js
-//
-// Main script for EACH ALL project.
-// Handles image submission, prompt management, and UI interactions.
-// This script is designed to work in tandem with a Netlify backend (submitImage.js) for image submission. 
-
-// ==== CONFIGURATION VARIABLES ====
-
-const CONFIG = {
-    promptsListPath: "prompts.json",
-    promptDataFolder: "prompts",
-    maxImageDimension: 200,
-    maxImageRenderDimension: 100,
-    defaultImageQuality: 0.5,
-    submitEndpoint: "/.netlify/functions/submitImage",
-    positionVariance: 10000,
-    seedOffsetX: 0,
-    seedOffsetY: 2731,
-    seedOffsetZ: 9649,
-    maxZIndex: 100,
-    seedMax: 1000000
-};
-
-const SELECTORS = {
-    modalHeader: "modal-header",
-    submissionModal: "submission-modal",
-    submissionsContainer: "submissions-container",
-    submissionWrapper: "submission-wrapper",
-    submissionForm: "submission-form",
-    usernameInput: "username-input",
-    imageInput: "image-input",
-    captionInput: "caption-input",
-    filenamePreview: "filename-preview",
-    submitButton: "submit-button",
-    toggleHeader: "toggle-header",
-    returnButton: "return-button",
-    randomizeButton: "randomize-button",
-    promptGrid: "prompt-grid",
-    promptText: "prompt-text",
-    aboutButton: "about-button",
-    aboutModal: "about-modal",
-    aboutClose: "about-close",
-    caption: "caption",
-    promptTile: "interactive-tile",
-    sortPopularButton: "sort-popular-button",
-    sortIdButton: "sort-id-button"
+const CONFIG = { maxImageDimension: 200, maxImageRenderDimension: 100, defaultImageQuality: 0.5, seedMax: 1000000 };
+const $ = id => document.getElementById(id);
+let prompts = [], counts = {}, currentPromptId = '', currentSeed = 0, view = 'scrapbook';
+let lastSortKey = 'id', sortDirections = { id: 'ascending', popular: 'descending' };
+const cache = new Map(), pending = new Map(), polling = new Set();
+let loadVersion = 0, previewURL = '', retryPayload = null, formVersion = 0, sending = false;
+let activeDialog = null, returnFocus = null, dragged = false;
+const newSeed = () => Math.floor(Math.random() * CONFIG.seedMax);
+const parseSeed = value => /^\d+$/.test(value || '') && Number(value) < CONFIG.seedMax ? Number(value) : newSeed();
+function rng(seed) {
+  return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
 }
-
-// ==== STATE VARIABLES ====
-
-let currentPromptId = "";
-let currentPrompts = [];
-let cachedSubmissions = {};
-const sortDefaults = {
-    id: "ascending",
-    popular: "descending"
-};
-let sortDirections = {
-    id: "ascending",
-    popular: "descending"
-};
-let sortIndicators = {};
-let lastSortKey = null;
-
-// ==== IMAGE SUBMISSION HANDLING ====
-
-// Handle image form submission: validate, compress, and send to backend
-async function submitImage(promptId, fileInput, captionInput) {
-    const file = fileInput.files[0];
-    if (!file) {
-        alert("oops! you need to choose an image file before submitting.");
-        return;
-    }
-
-    // Validate file type
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
-    if (!allowedTypes.includes(file.type)) {
-        alert("that file format isn’t supported. try uploading a jpg, png, or webp image.");
-        return;
-    }
-
-    // Parse optional quality and dimension params from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const qualityParam = parseFloat(urlParams.get("quality"));
-    const quality = !isNaN(qualityParam) && qualityParam >= 0 && qualityParam <= 1 ? qualityParam : CONFIG.defaultImageQuality;
-
-    const maxDimParam = parseInt(urlParams.get("maxDim"));
-    const maxDim = !isNaN(maxDimParam) && maxDimParam > 0 ? maxDimParam : CONFIG.maxImageDimension;
-
-    // Disable the submit button before starting submission
-    const submitBtn = document.getElementById(SELECTORS.submitButton);
-    submitBtn.disabled = true;
-
-    try {
-        // Resize and compress image
-        const imageData = await resizeAndCompressImage(file, quality, maxDim);
-        const username = document.getElementById(SELECTORS.usernameInput).value.trim();
-        if (!username) {
-            alert("hey! make sure to add a username (can be a pseudonym of course).");
-            document.getElementById(SELECTORS.usernameInput).focus();
-            return;
-        }
-        const caption = captionInput.value;
-
-        // Save seed from URL or generate a random one
-        const seed = new URLSearchParams(window.location.search).get("seed") || generateRandomSeed();
-
-        // Prepare payload for submission
-        const payload = {
-            username,
-            promptId,
-            caption,
-            imageData,
-            seed
-        };
-
-        const res = await fetch(CONFIG.submitEndpoint, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
-        });
-
-        const result = await res.json();
-        if (result.success) {
-            alert("thanks for sharing! your image has been submitted. check back in a minute or so to see it live.");
-
-            // Reset only file and caption fields (leave username intact)
-            fileInput.value = "";
-            captionInput.value = "";
-            document.getElementById(SELECTORS.filenamePreview).textContent = "";
-        } else {
-            alert("uh oh... something went wrong with your submission. " + (result.error || "please try again later."));
-        }
-    } catch (error) {
-        console.error("Error submitting image:", error);
-        alert("something went wrong while submitting. you can try peeking at the console for details, or try again in a bit.");
-    } finally {
-        // Re-enable the submit button after operation completes
-        submitBtn.disabled = false;
-    }
+function hash(value) { let result = 0; for (const ch of value) result = Math.imul(result, 31) + ch.charCodeAt(0) | 0; return result; }
+function status(message) { $('submission-status').textContent = message; }
+function showDialog(id) {
+  const dialog = $(id);
+  if (activeDialog === dialog) return;
+  if (activeDialog) activeDialog.classList.remove('visible');
+  else returnFocus = document.activeElement;
+  activeDialog = dialog;
+  dialog.classList.add('visible');
+  for (const node of document.body.children) if (node.tagName !== 'SCRIPT') node.inert = node !== dialog;
+  document.body.style.overflow = 'hidden';
+  ([...dialog.querySelectorAll('button')].find(node => !node.closest('[inert]') && node.getClientRects().length) || dialog).focus();
 }
-
-// Wrapper for form submission event
-function handleSubmit() {
-    const form = document.getElementById(SELECTORS.submissionForm);
-    const fileInput = form.elements[SELECTORS.imageInput];
-    const captionInput = form.elements[SELECTORS.captionInput];
-    submitImage(currentPromptId, fileInput, captionInput);
+function hideDialog() {
+  if (activeDialog) activeDialog.classList.remove('visible');
+  activeDialog = null;
+  for (const node of document.body.children) node.inert = false;
+  document.body.style.overflow = '';
+  if (returnFocus?.isConnected) returnFocus.focus(); else $('about-button').focus();
 }
-
-// Resize and compress the uploaded image file, returning a DataURL
-async function resizeAndCompressImage(file, quality = CONFIG.defaultImageQuality, maxDim = CONFIG.maxImageDimension) {
-    const imageBitmap = await createImageBitmap(file);
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-
-    // Calculate scale to fit within maxDim
-    const scale = Math.min(maxDim / imageBitmap.width, maxDim / imageBitmap.height, 1);
-    canvas.width = imageBitmap.width * scale;
-    canvas.height = imageBitmap.height * scale;
-
-    ctx.drawImage(imageBitmap, 0, 0, canvas.width, canvas.height);
-
-    // Convert canvas to DataURL asynchronously
-    return new Promise((resolve) => {
-        canvas.toBlob(
-            (blob) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.readAsDataURL(blob);
-            },
-            "image/jpeg",
-            quality
-        );
+function clearPreview() {
+  if (previewURL) URL.revokeObjectURL(previewURL);
+  previewURL = '';
+  $('image-preview').hidden = true;
+  $('image-preview').removeAttribute('src');
+  $('filename-preview').textContent = '';
+}
+function closePrompt(updateHistory = true) {
+  loadVersion++;
+  currentPromptId = '';
+  hideDialog();
+  if (updateHistory) {
+    const url = new URL(location.href); url.searchParams.delete('prompt'); url.searchParams.delete('seed');
+    history.pushState({}, '', url);
+  }
+  if (!sending) { $('image-input').value = ''; clearPreview(); retryPayload = null; formVersion++; }
+}
+async function getEntries(id, fresh = false) {
+  const res = await fetch(`prompts/${id}.json${fresh ? `?v=${Date.now()}` : ''}`, fresh ? { cache: 'no-store' } : {});
+  if (res.status === 404) return [];
+  if (!res.ok) throw new Error('Could not load images.');
+  const data = await res.json(); if (!Array.isArray(data)) throw new Error('Invalid image list.');
+  return data;
+}
+function combinedEntries(id) {
+  const entries = cache.get(id) || [];
+  return [...entries, ...(pending.get(id) || []).filter(sub => !entries.some(saved => saved.id === sub.id))];
+}
+async function openPrompt(id, seed, useCache = false) {
+  const prompt = prompts.find(p => p.id === id);
+  if (!prompt) { closePrompt(false); $('home-status').textContent = 'That prompt does not exist. Choose a number below.'; return; }
+  const changed = currentPromptId !== id;
+  currentPromptId = id; currentSeed = parseSeed(String(seed));
+  $('prompt-text').textContent = `${id}: ${prompt.prompt}`;
+  if (changed && !sending) { status(''); retryPayload = null; }
+  showDialog('submission-modal');
+  const version = ++loadVersion;
+  if (useCache && cache.has(id)) { render(); return; }
+  $('submissions-container').textContent = 'loading images…';
+  try {
+    const entries = await getEntries(id);
+    cache.set(id, entries);
+    if (version === loadVersion && currentPromptId === id) render();
+  } catch {
+    if (version !== loadVersion) return;
+    $('submissions-container').textContent = '';
+    const message = document.createElement('p'); message.textContent = 'Images could not load. Your contributions are safe.';
+    const retry = document.createElement('button'); retry.textContent = 'try again'; retry.className = 'interactive-tile';
+    retry.onclick = () => openPrompt(id, currentSeed);
+    $('submissions-container').append(message, retry);
+  }
+}
+function render() {
+  const container = $('submissions-container'); container.replaceChildren(); container.classList.toggle('list-view', view === 'list');
+  let entries = combinedEntries(currentPromptId);
+  if (!entries.length) { const empty = document.createElement('p'); empty.className = 'no-submissions'; empty.textContent = 'no submissions yet – be the first to add one!'; container.append(empty); return; }
+  if (view === 'scrapbook') {
+    const groups = new Map();
+    for (const sub of entries) { if (!groups.has(sub.username)) groups.set(sub.username, []); groups.get(sub.username).push(sub); }
+    entries = [...groups].map(([name, subs]) => {
+      const waiting = subs.filter(sub => sub.pending);
+      return waiting.at(-1) || subs[Math.floor(rng(currentSeed + hash(name))() * subs.length)];
     });
-}
-
-// ==== PROMPT MODAL HANDLING ====
-
-// Open the submission modal for a prompt and display its submissions
-function openPrompt(promptId, seed = generateRandomSeed(), skipFetch = false) {
-    currentPromptId = promptId;
-
-    // Display prompt text from currentPrompts
-    const promptObj = currentPrompts.find(p => p.id === promptId);
-    document.getElementById(SELECTORS.promptText).textContent = promptObj ? `${promptId}: ${promptObj.prompt}` : promptId;
-
-    const modal = document.getElementById(SELECTORS.submissionModal);
-    if (modal) {
-        modal.classList.add("visible");
+  }
+  const random = rng(currentSeed);
+  for (const sub of entries) {
+    const wrapper = document.createElement('div'); wrapper.className = 'submission-wrapper';
+    const button = document.createElement('button'); button.type = 'button'; button.className = 'image-button';
+    button.setAttribute('aria-label', `${sub.username}${sub.caption ? ': ' + sub.caption : ''}${sub.pending ? ' (publishing)' : ''}`);
+    button.setAttribute('aria-expanded', String(view === 'list'));
+    const img = document.createElement('img'); img.src = sub.imagePath || sub.imageData; img.alt = sub.caption || `Contribution by ${sub.username}`; img.draggable = false;
+    img.loading = view === 'list' ? 'lazy' : 'eager';
+    const caption = document.createElement('div'); caption.className = 'caption';
+    caption.textContent = `${sub.username}${sub.caption ? ': ' + sub.caption : ''}${sub.pending ? ' · publishing…' : ''}`;
+    button.append(img); wrapper.append(button, caption); container.append(wrapper);
+    if (view === 'scrapbook') {
+      wrapper.style.left = `${Math.floor(random() * Math.max(0, container.clientWidth - 100))}px`;
+      wrapper.style.top = `${Math.floor(random() * Math.max(0, container.clientHeight - 100))}px`;
+      wrapper.style.zIndex = Math.floor(random() * 100);
+      caption.classList.add(parseFloat(wrapper.style.left) > container.clientWidth / 2 ? 'caption-right' : 'caption-left');
+      button.onclick = event => {
+        event.stopPropagation();
+        if (dragged) { dragged = false; return; }
+        const show = !wrapper.classList.contains('caption-open'); hideCaptions();
+        wrapper.classList.toggle('caption-open', show); button.setAttribute('aria-expanded', String(show));
+      };
+      makeDraggable(wrapper, button);
     }
-
-    const container = document.getElementById(SELECTORS.submissionsContainer);
-    container.innerHTML = "";
-
-    // Fetch and display submissions for the prompt
-    if (!skipFetch) {
-        fetch(`${CONFIG.promptDataFolder}/${promptId}.json`)
-            .then(res => res.ok ? res.json() : null)
-            .then(submissions => {
-                if (!submissions) {
-                    console.warn(`No submission file yet for prompt ${promptId}.`);
-                    container.innerHTML = "<div class='no-submissions'>no submissions yet – be the first to add one!</div>";
-                    return;
-                }
-                if (!Array.isArray(submissions) || submissions.length === 0) {
-                    console.warn(`No submissions found for prompt ${promptId}.`);
-                    container.innerHTML = "<div class='no-submissions'>no submissions yet – be the first to add one!</div>";
-                    return;
-                }
-                cachedSubmissions[promptId] = submissions;
-                renderSubmissions(submissions, promptId, seed);
-            })
-            .catch(err => {
-                console.error("Failed to load submissions:", err);
-            });
-    } else {
-        const cached = cachedSubmissions[promptId];
-        if (Array.isArray(cached) && cached.length > 0) {
-            renderSubmissions(cached, promptId, seed);
-        } else {
-            console.warn(`No cached submissions available or prompt is empty for prompt ${promptId}.`);
-            container.innerHTML = "<div class='no-submissions'>no submissions yet – be the first to add one!</div>";
-        }
+    if (sub.pending) wrapper.classList.add('is-pending');
+  }
+}
+function hideCaptions() {
+  document.querySelectorAll('.caption-open').forEach(node => { node.classList.remove('caption-open'); node.querySelector('button').setAttribute('aria-expanded', 'false'); });
+}
+function makeDraggable(wrapper, button) {
+  let start = null;
+  button.addEventListener('pointerdown', event => {
+    if (event.button !== 0) return;
+    dragged = false;
+    start = { x: event.clientX, y: event.clientY, left: wrapper.offsetLeft, top: wrapper.offsetTop };
+    button.setPointerCapture(event.pointerId);
+  });
+  button.addEventListener('pointermove', event => {
+    if (!start) return;
+    const dx = event.clientX - start.x, dy = event.clientY - start.y;
+    if (Math.hypot(dx, dy) > 5) dragged = true;
+    if (!dragged) return;
+    wrapper.style.zIndex = 101;
+    const container = $('submissions-container');
+    wrapper.style.left = `${Math.max(0, Math.min(container.clientWidth - wrapper.offsetWidth, start.left + dx))}px`;
+    wrapper.style.top = `${Math.max(0, Math.min(container.clientHeight - wrapper.offsetHeight, start.top + dy))}px`;
+  });
+  button.addEventListener('pointerup', () => { start = null; });
+  button.addEventListener('pointercancel', () => { start = null; dragged = false; });
+}
+function renderTiles() {
+  const sorted = [...prompts].sort((a, b) => {
+    const delta = lastSortKey === 'popular' ? (counts[a.id] || 0) - (counts[b.id] || 0) : a.id.localeCompare(b.id);
+    return (sortDirections[lastSortKey] === 'ascending' ? delta : -delta) || a.id.localeCompare(b.id);
+  });
+  const restoreId = returnFocus?.matches?.('#prompt-grid a') ? returnFocus.textContent : null;
+  $('prompt-grid').replaceChildren();
+  for (const prompt of sorted) {
+    const tile = document.createElement('a'); tile.className = 'interactive-tile'; tile.textContent = prompt.id;
+    tile.href = `?prompt=${prompt.id}&seed=${newSeed()}`; tile.setAttribute('aria-label', `${prompt.id}: ${prompt.prompt}`);
+    tile.onclick = event => {
+      if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      event.preventDefault(); history.pushState({}, '', tile.href); openPrompt(prompt.id, new URL(tile.href).searchParams.get('seed'));
+    };
+    $('prompt-grid').append(tile);
+    if (restoreId === prompt.id) returnFocus = tile;
+  }
+  for (const key of ['id', 'popular']) {
+    const button = $(`sort-${key}-button`); button.setAttribute('aria-pressed', String(lastSortKey === key));
+    button.textContent = (key === 'id' ? 'ID' : 'Popular') + (lastSortKey === key ? (sortDirections[key] === 'ascending' ? ' ↑' : ' ↓') : '');
+  }
+}
+async function compress(file) {
+  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) throw new Error('Choose a JPG, PNG, or WebP image.');
+  if (file.size > 20 * 1024 * 1024) throw new Error('Choose an image smaller than 20 MB.');
+  let bitmap;
+  try { bitmap = await createImageBitmap(file); } catch { throw new Error('This image could not be read. Please choose another file.'); }
+  const params = new URLSearchParams(location.search);
+  const dimension = Math.min(1000, Math.max(1, Number(params.get('maxDim')) || 200));
+  const quality = params.has('quality') ? Math.min(1, Math.max(0, Number(params.get('quality')) || 0.5)) : 0.5;
+  const scale = Math.min(dimension / bitmap.width, dimension / bitmap.height, 1);
+  const canvas = document.createElement('canvas'); canvas.width = Math.max(1, Math.round(bitmap.width * scale)); canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+  const ctx = canvas.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height); bitmap.close();
+  const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
+  if (!blob || blob.size > 200 * 1024) throw new Error('This image is still too large. Try a smaller image.');
+  return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = () => reject(new Error('Could not read the image.')); reader.readAsDataURL(blob); });
+}
+async function submit(event) {
+  event.preventDefault(); if (sending) return;
+  const id = currentPromptId, version = formVersion;
+  if (retryPayload?.promptId !== id) retryPayload = null;
+  sending = true; for (const input of $('submission-form').querySelectorAll('input')) input.disabled = true; $('submit-button').disabled = true; $('submit-button').textContent = 'uploading…';
+  $('submission-form').setAttribute('aria-busy', 'true'); status('Preparing your image…');
+  try {
+    const username = $('username-input').value.trim();
+    if (!username) throw new Error('Please enter a username.');
+    if (!retryPayload) retryPayload = { promptId: id, username, caption: $('caption-input').value, seed: currentSeed, submissionId: crypto.randomUUID(), imageData: await compress($('image-input').files[0]) };
+    const payload = retryPayload;
+    if (currentPromptId === id) status('Uploading your image…');
+    const controller = new AbortController(), timeout = setTimeout(() => controller.abort(), 30000);
+    let res;
+    try { res = await fetch('/.netlify/functions/submitImage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal: controller.signal }); } finally { clearTimeout(timeout); }
+    let result;
+    try { result = await res.json(); } catch { throw new Error('Could not save your image. Please try again; your form has been kept.'); }
+    if (!res.ok || !result.success || !result.submission) throw new Error(result.error || 'Could not save your image. Please try again.');
+    const local = { ...result.submission, imagePath: undefined, imageData: payload.imageData, pending: true };
+    pending.set(id, [...(pending.get(id) || []).filter(sub => sub.id !== local.id), local]);
+    counts[id] = result.count; renderTiles();
+    if (currentPromptId === id) { render(); status('Thanks for sharing! Your image is saved and appears here while it publishes for everyone.'); }
+    if (version === formVersion) { $('image-input').value = ''; $('caption-input').value = ''; clearPreview(); retryPayload = null; }
+    pollPublished(id);
+  } catch (error) {
+    if (currentPromptId === id) status(error.name === 'AbortError' ? 'The upload timed out. Try again; the same submission will not be saved twice.' : error.message || 'Could not upload. Please try again.');
+  } finally {
+    sending = false; for (const input of $('submission-form').querySelectorAll('input')) input.disabled = false; $('submit-button').disabled = false; $('submit-button').textContent = 'submit'; $('submission-form').setAttribute('aria-busy', 'false');
+  }
+}
+async function pollPublished(id) {
+  if (polling.has(id)) return;
+  polling.add(id);
+  try {
+    for (let attempt = 0; attempt < 18 && (pending.get(id) || []).length; attempt++) {
+      await new Promise(resolve => setTimeout(resolve, 10000));
+      try {
+        const entries = await getEntries(id, true);
+        const waiting = (pending.get(id) || []).filter(sub => !entries.some(saved => saved.id === sub.id));
+        pending.set(id, waiting); cache.set(id, entries);
+        if (currentPromptId === id) { render(); if (!waiting.length) status('Your image is now published. Thanks for sharing!'); }
+      } catch { /* Keep the saved local preview until the deployment is available. */ }
     }
+    if ((pending.get(id) || []).length && currentPromptId === id) status('Your image is saved. Publishing is taking a little longer; you can check back later.');
+  } finally { polling.delete(id); }
 }
-
-function renderSubmissions(submissions, promptId, seed) {
-    const container = document.getElementById(SELECTORS.submissionsContainer);
-    container.innerHTML = "";
-
-    // Group submissions by username
-    const grouped = {};
-    submissions.forEach((sub) => {
-        if (!grouped[sub.username]) grouped[sub.username] = [];
-        grouped[sub.username].push(sub);
-    });
-
-    const usernames = Object.keys(grouped);
-    shuffleArray(usernames, seed);
-
-    usernames.forEach((username, i) => {
-        const userSubs = grouped[username];
-
-        // Deterministically select a submission per user
-        const userHash = hashString(username);
-
-        const rng = mulberry32(seed + userHash);
-        const randIndex = Math.floor(rng() * userSubs.length);
-        const sub = userSubs[randIndex];
-        const randX = Math.floor(rng() * (container.clientWidth - CONFIG.maxImageRenderDimension));
-        const randY = Math.floor(rng() * (container.clientHeight - CONFIG.maxImageRenderDimension));
-        const zIndex = Math.floor(rng() * CONFIG.maxZIndex);
-
-        const wrapper = document.createElement("div");
-        wrapper.className = SELECTORS.submissionWrapper;
-        wrapper.style.left = `${randX}px`;
-        wrapper.style.top = `${randY}px`;
-        wrapper.style.zIndex = zIndex;
-
-        const img = document.createElement("img");
-        img.src = sub.imageData;
-        img.ondragstart = () => false;
-        img.alt = sub.caption || sub.username || "User submission";
-
-        const caption = document.createElement("div");
-        caption.className = SELECTORS.caption;
-        caption.textContent = sub.caption ? `${sub.username}: ${sub.caption}` : sub.username;
-
-        // Set caption alignment and position based on image position
-        const containerMidpoint = container.clientWidth / 2;
-        const wrapperX = Math.abs(randX);
-        if (wrapperX < containerMidpoint) {
-            caption.classList.add("caption-left");
-        } else {
-            caption.classList.add("caption-right");
-        }
-
-        wrapper.appendChild(img);
-        wrapper.appendChild(caption);
-        container.appendChild(wrapper);
-
-        // Make wrapper draggable (mouse)
-        let offsetX, offsetY;
-
-        wrapper.addEventListener("mousedown", (e) => {
-            offsetX = e.clientX - wrapper.offsetLeft;
-            offsetY = e.clientY - wrapper.offsetTop;
-
-            function onMouseMove(e) {
-                wrapper.style.left = `${e.clientX - offsetX}px`;
-                wrapper.style.top = `${e.clientY - offsetY}px`;
-            }
-
-            function onMouseUp() {
-                document.removeEventListener("mousemove", onMouseMove);
-                document.removeEventListener("mouseup", onMouseUp);
-            }
-
-            document.addEventListener("mousemove", onMouseMove);
-            document.addEventListener("mouseup", onMouseUp);
-        });
-
-        // Make wrapper draggable (touch)
-        wrapper.addEventListener("touchstart", (e) => {
-            const touch = e.touches[0];
-            offsetX = touch.clientX - wrapper.offsetLeft;
-            offsetY = touch.clientY - wrapper.offsetTop;
-
-            function onTouchMove(e) {
-                const touch = e.touches[0];
-                wrapper.style.left = `${touch.clientX - offsetX}px`;
-                wrapper.style.top = `${touch.clientY - offsetY}px`;
-            }
-
-            function onTouchEnd() {
-                document.removeEventListener("touchmove", onTouchMove);
-                document.removeEventListener("touchend", onTouchEnd);
-            }
-
-            document.addEventListener("touchmove", onTouchMove);
-            document.addEventListener("touchend", onTouchEnd);
-        });
-    });
+function syncURL() {
+  const url = new URL(location.href), id = url.searchParams.get('prompt');
+  if (id) openPrompt(id, url.searchParams.get('seed'), true); else closePrompt(false);
 }
-
-// Close the submission modal and reset form state
-function closeModal() {
-    document.getElementById(SELECTORS.submissionModal).classList.remove("visible");
-    const url = new URL(window.location);
-    url.searchParams.delete("prompt");
-    url.searchParams.delete("seed");
-    window.history.pushState({}, "", url);
-    document.getElementById(SELECTORS.imageInput).value = "";
-    document.getElementById(SELECTORS.filenamePreview).textContent = "";
-}
-
-// Toggle the modal header between minimized and expanded
-function handleToggleHeader(e) {
-    e.preventDefault();
-    const header = document.getElementById(SELECTORS.modalHeader);
-    const isMinimized = header.classList.toggle("minimized");
-    const toggleBtn = document.getElementById(SELECTORS.toggleHeader);
-    toggleBtn.textContent = isMinimized ? "↓" : "↑";
-}
-
-// Randomize the seed for current prompt and reload modal
-function handleRandomizeSeed() {
-    const url = new URL(window.location);
-    const currentPrompt = url.searchParams.get("prompt");
-    if (currentPrompt) {
-        const newSeed = generateRandomSeed();
-        url.searchParams.set("seed", newSeed);
-        window.history.pushState({}, "", url);
-        openPrompt(currentPrompt, newSeed, true);
+document.addEventListener('DOMContentLoaded', async () => {
+  const homeStatus = document.createElement('p'); homeStatus.id = 'home-status'; homeStatus.setAttribute('role', 'status'); $('prompt-grid').before(homeStatus);
+  let username;
+  try { username = localStorage.getItem('eachAllUsername'); } catch {}
+  $('username-input').value = username || 'user_' + Math.random().toString(36).slice(2, 10);
+  try { localStorage.setItem('eachAllUsername', $('username-input').value); } catch {}
+  $('username-input').addEventListener('input', () => { try { localStorage.setItem('eachAllUsername', $('username-input').value); } catch {} });
+  $('submission-form').addEventListener('input', () => { retryPayload = null; formVersion++; });
+  $('submission-form').addEventListener('submit', submit);
+  $('image-input').addEventListener('change', () => {
+    clearPreview(); retryPayload = null; formVersion++; status('');
+    const file = $('image-input').files[0]; if (!file) return;
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 20 * 1024 * 1024) { status('Choose a JPG, PNG, or WebP smaller than 20 MB.'); $('image-input').value = ''; return; }
+    previewURL = URL.createObjectURL(file); $('image-preview').src = previewURL; $('image-preview').hidden = false; $('filename-preview').textContent = file.name;
+  });
+  $('return-button').onclick = () => closePrompt();
+  $('randomize-button').onclick = () => { currentSeed = newSeed(); const url = new URL(location.href); url.searchParams.set('seed', currentSeed); history.pushState({}, '', url); render(); };
+  $('view-button').onclick = () => { view = view === 'list' ? 'scrapbook' : 'list'; $('view-button').textContent = view === 'list' ? 'scrapbook view' : 'list view'; $('view-button').setAttribute('aria-pressed', String(view === 'list')); render(); };
+  $('toggle-header').onclick = () => { const hidden = $('modal-header').classList.toggle('minimized'); $('modal-header').inert = hidden; $('toggle-header').textContent = hidden ? '↓' : '↑'; $('toggle-header').setAttribute('aria-expanded', String(!hidden)); $('toggle-header').setAttribute('aria-label', hidden ? 'Show submission controls' : 'Hide submission controls'); };
+  for (const key of ['id', 'popular']) $(`sort-${key}-button`).onclick = () => {
+    sortDirections[key] = lastSortKey === key ? (sortDirections[key] === 'ascending' ? 'descending' : 'ascending') : (key === 'id' ? 'ascending' : 'descending'); lastSortKey = key; renderTiles();
+  };
+  $('about-button').onclick = () => showDialog('about-modal'); $('about-close').onclick = hideDialog;
+  $('about-modal').onclick = event => { if (event.target === $('about-modal')) hideDialog(); };
+  document.addEventListener('click', hideCaptions);
+  document.addEventListener('keydown', event => {
+    if (!activeDialog) return;
+    if (event.key === 'Escape') { event.preventDefault(); if (activeDialog.id === 'submission-modal') closePrompt(); else hideDialog(); }
+    if (event.key === 'Tab') {
+      const nodes = [...activeDialog.querySelectorAll('button, a[href], input, [tabindex="0"]')].filter(node => !node.disabled && !node.closest('[inert]') && node.getClientRects().length);
+      const first = nodes[0], last = nodes.at(-1);
+      if (!first) { event.preventDefault(); activeDialog.focus(); }
+      else if (event.shiftKey && (document.activeElement === first || document.activeElement === activeDialog)) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     }
-}
-
-// Deterministically shuffle an array using Math.sin() and a seed
-function shuffleArray(array, seed) {
-    const rng = mulberry32(seed);
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(rng() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
-
-// Generate a random seed for image positioning and submission display
-function generateRandomSeed() {
-    return Math.floor(Math.random() * CONFIG.seedMax);
-}
-
-// Simple PRNG based on the Mulberry32 algorithm
-function mulberry32(seed) {
-    return function () {
-        seed |= 0; seed = seed + 0x6D2B79F5 | 0;
-        let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
-        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-        return ((t ^ t >>> 14) >>> 0) / 4294967296;
-    }
-}
-
-// Simple string hashing function for consistent pseudo-randomness
-function hashString(str) {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-        hash = ((hash << 5) - hash) + str.charCodeAt(i);
-        hash |= 0; // Convert to 32-bit int
-    }
-    return hash;
-}
-
-// ==== PROMPT GRID INITIALIZATION ====
-
-// Render prompt tiles in the grid
-function renderPromptTiles(promptArray) {
-    const grid = document.getElementById(SELECTORS.promptGrid);
-    grid.innerHTML = "";
-    promptArray.forEach((prompt) => {
-        const div = document.createElement("div");
-        div.className = SELECTORS.promptTile;
-        div.textContent = prompt.id;
-
-        // Clicking a tile opens the prompt modal for that prompt
-        div.addEventListener("click", () => {
-            const seed = generateRandomSeed();
-            const url = new URL(window.location);
-            url.searchParams.set("prompt", prompt.id);
-            url.searchParams.set("seed", seed);
-            window.history.pushState({}, "", url);
-            openPrompt(prompt.id, seed);
-        });
-        grid.appendChild(div);
-    });
-}
-
-// Update sort indicator arrows on sort buttons
-function updateSortIndicators(activeKey) {
-    Object.keys(sortIndicators).forEach(key => {
-        const btn = sortIndicators[key];
-        const isDefault = sortDirections[key] === sortDefaults[key];
-        if (key === activeKey) {
-            btn.textContent = key === "popular" ? "Popular" : "ID";
-            btn.textContent += isDefault ? " ↑" : " ↓";
-        } else {
-            btn.textContent = key === "popular" ? "Popular" : "ID";
-        }
-    });
-}
-
-// Helper function to toggle sort direction for a given key
-function toggleSortDirection(key) {
-    sortDirections[key] = sortDirections[key] === "ascending" ? "descending" : "ascending";
-}
-
-// Fetch the submission counts for each prompt for popularity sorting
-async function getPromptSubmissionCounts(prompts) {
-    const counts = await Promise.all(prompts.map(async (prompt) => {
-        try {
-            const res = await fetch(`${CONFIG.promptDataFolder}/${prompt.id}.json`);
-            if (!res.ok) return {
-                id: prompt.id,
-                count: 0
-            };
-            const data = await res.json();
-
-            // Count number of submissions if data is array
-            return {
-                id: prompt.id,
-                count: Array.isArray(data) ? data.length : 0
-            };
-        } catch {
-            return {
-                id: prompt.id,
-                count: 0
-            };
-        }
-    }));
-    return counts;
-}
-
-// Sort prompts by popularity and re-render tiles
-async function handleSortByPopularity() {
-    if (lastSortKey !== "popular") {
-        sortDirections.popular = sortDefaults.popular;
-    } else {
-        toggleSortDirection("popular");
-    }
-    lastSortKey = "popular";
-
-    const counts = await getPromptSubmissionCounts(currentPrompts);
-    const countMap = Object.fromEntries(counts.map(c => [c.id, c.count]));
-
-    const sorted = currentPrompts.slice().sort((a, b) => {
-        const diff = (countMap[b.id] || 0) - (countMap[a.id] || 0);
-        return sortDirections.popular === "descending" ? diff : -diff;
-    });
-
-    updateSortIndicators("popular");
-    renderPromptTiles(sorted);
-}
-
-// Sort prompts by ID and re-render tiles
-function handleSortById() {
-    if (lastSortKey !== "id") {
-        sortDirections.id = sortDefaults.id;
-    } else {
-        toggleSortDirection("id");
-    }
-    lastSortKey = "id";
-
-    const sorted = currentPrompts.slice().sort((a, b) => {
-        return sortDirections.id === "ascending" ?
-            a.id.localeCompare(b.id) :
-            b.id.localeCompare(a.id);
-    });
-
-    updateSortIndicators("id");
-    renderPromptTiles(sorted);
-}
-
-// ==== USERNAME MANAGEMENT ====
-
-// Generate a random username and save it if none exists
-function getUsername() {
-    let username = localStorage.getItem("eachAllUsername");
-    if (!username) {
-        username = "user_" + Math.random().toString(36).substring(2, 10);
-        localStorage.setItem("eachAllUsername", username);
-    }
-    return username;
-}
-
-// Set the username in localStorage
-function setUsername(newUsername) {
-    localStorage.setItem("eachAllUsername", newUsername);
-}
-
-// ==== INITIALIZATION ====
-
-// Main page initialization logic
-document.addEventListener("DOMContentLoaded", () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const promptId = urlParams.get("prompt");
-    const seed = urlParams.get("seed");
-
-    // If a seed is present without a prompt, clean up the URL
-    if (!promptId && seed) {
-        const url = new URL(window.location);
-        url.searchParams.delete("seed");
-        window.history.replaceState({}, "", url.pathname);
-    }
-
-    // Load prompt data and initialize grid
-    fetch(CONFIG.promptsListPath)
-        .then((res) => res.json())
-        .then((prompts) => {
-            currentPrompts = prompts.slice();
-            sortIndicators = {
-                popular: document.getElementById(SELECTORS.sortPopularButton),
-                id: document.getElementById(SELECTORS.sortIdButton)
-            };
-            handleSortById(); // Activate default sort by ID ascending
-
-            // Open prompt modal after currentPrompts is set
-            if (promptId) {
-                let finalSeed = seed ? parseInt(seed) : generateRandomSeed();
-
-                // If no seed was in the URL, add it
-                if (!seed) {
-                    const url = new URL(window.location);
-                    url.searchParams.set("seed", finalSeed);
-                    window.history.replaceState({}, "", url);
-                }
-
-                openPrompt(promptId, finalSeed);
-            }
-        });
-
-    // Prefill username input and save changes
-    const usernameInput = document.getElementById(SELECTORS.usernameInput);
-    const savedUsername = getUsername();
-    usernameInput.value = savedUsername;
-    usernameInput.addEventListener("input", () => {
-        setUsername(usernameInput.value);
-    });
-
-    /* EVENT LISTENERS */
-
-    // Handle image submission form
-    document.getElementById(SELECTORS.submissionForm).addEventListener("submit", (e) => {
-        e.preventDefault();
-        handleSubmit();
-    });
-
-    // Toggle header collapse/expand
-    document.getElementById(SELECTORS.toggleHeader).addEventListener("click", handleToggleHeader);
-
-    // Close the prompt modal
-    document.getElementById(SELECTORS.returnButton).addEventListener("click", closeModal);
-
-    // Randomize the seed for current prompt view
-    document.getElementById(SELECTORS.randomizeButton).addEventListener("click", handleRandomizeSeed);
-
-    // Sort prompts by popularity
-    document.getElementById(SELECTORS.sortPopularButton).addEventListener("click", handleSortByPopularity);
-
-    // Sort prompts by ID
-    document.getElementById(SELECTORS.sortIdButton).addEventListener("click", handleSortById);
-
-    // Open about modal button
-    document.getElementById(SELECTORS.aboutButton).addEventListener("click", () => {
-        document.getElementById(SELECTORS.aboutModal).classList.add("visible");
-    });
-
-    // Close about modal button
-    document.getElementById(SELECTORS.aboutClose).addEventListener("click", () => {
-        document.getElementById(SELECTORS.aboutModal).classList.remove("visible");
-    });
-
-    // Close about modal by clicking outside of the modal content window, i.e. the overlay
-    document.getElementById(SELECTORS.aboutModal).addEventListener("click", (e) => {
-        if (e.target.id === SELECTORS.aboutModal) {
-            document.getElementById(SELECTORS.aboutModal).classList.remove("visible");
-        }
-    });
-
-    // Show selected file name in preview
-    document.getElementById(SELECTORS.imageInput).addEventListener("change", (event) => {
-        const file = event.target.files[0];
-        const previewContainer = document.getElementById(SELECTORS.filenamePreview);
-        previewContainer.textContent = file ? file.name : "";
-    });
-
-    // About modal open by default on page load for the homepage
-    const params = new URLSearchParams(window.location.search);
-    if (!params.has("prompt") && !params.has("seed")) {
-        document.getElementById(SELECTORS.aboutModal).classList.add("visible");
-    }
-
-    // Handle browser navigation to maintain modal state
-    window.addEventListener("popstate", () => {
-        const params = new URLSearchParams(window.location.search);
-        const promptId = params.get("prompt");
-        const seed = params.get("seed");
-
-        if (promptId) {
-            // Reopen the modal when navigating back/forward to a prompt URL
-            openPrompt(promptId, seed ? parseInt(seed) : undefined, true);
-        } else {
-            // Close modal when navigating back to the grid view
-            closeModal();
-        }
-    });
-
-    // Tap-to-toggle captions on mobile: only one visible at a time, tap outside hides
-    if (window.innerWidth <= 768) {
-        let currentlyVisibleCaption = null;
-        document.querySelectorAll("." + SELECTORS.submissionWrapper).forEach(wrapper => {
-            wrapper.addEventListener("click", (event) => {
-                event.stopPropagation(); // Prevent the global click from triggering
-                const caption = wrapper.querySelector("." + SELECTORS.caption);
-                if (!caption) return;
-
-                // Hide the currently visible caption if it's different
-                if (currentlyVisibleCaption && currentlyVisibleCaption !== caption) {
-                    currentlyVisibleCaption.classList.remove("caption-visible");
-                    currentlyVisibleCaption.classList.add("caption-hidden");
-                }
-                const isVisible = caption.classList.contains("caption-visible");
-                caption.classList.toggle("caption-visible", !isVisible);
-                caption.classList.toggle("caption-hidden", isVisible);
-                currentlyVisibleCaption = isVisible ? null : caption;
-            });
-        });
-
-        // Hide caption if tapping anywhere else
-        document.addEventListener("click", () => {
-            if (currentlyVisibleCaption) {
-                currentlyVisibleCaption.classList.remove("caption-visible");
-                currentlyVisibleCaption.classList.add("caption-hidden");
-                currentlyVisibleCaption = null;
-            }
-        });
-    }
+  });
+  window.addEventListener('popstate', syncURL);
+  let resizeTimer;
+  window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (innerWidth > 768 && $('modal-header').classList.contains('minimized')) { $('modal-header').classList.remove('minimized'); $('modal-header').inert = false; $('toggle-header').textContent = '↑'; $('toggle-header').setAttribute('aria-expanded', 'true'); $('toggle-header').setAttribute('aria-label', 'Hide submission controls'); } if (currentPromptId && cache.has(currentPromptId)) render(); }, 150); });
+  homeStatus.textContent = 'loading prompts…';
+  try {
+    const res = await fetch('prompts.json'); if (!res.ok) throw new Error(); prompts = await res.json(); renderTiles(); homeStatus.textContent = '';
+    const url = new URL(location.href);
+    if (url.searchParams.has('prompt')) { const seed = parseSeed(url.searchParams.get('seed')); url.searchParams.set('seed', seed); history.replaceState({}, '', url); await openPrompt(url.searchParams.get('prompt'), seed); }
+    else { if (url.searchParams.has('seed')) { url.searchParams.delete('seed'); history.replaceState({}, '', url); } showDialog('about-modal'); }
+  } catch { homeStatus.textContent = 'Could not load prompts. Please refresh to try again.'; }
+  try { const res = await fetch('counts.json'); if (!res.ok) throw new Error(); counts = { ...await res.json(), ...Object.fromEntries([...pending.keys()].map(id => [id, counts[id]])) }; if (lastSortKey === 'popular') renderTiles(); }
+  catch { homeStatus.textContent = 'Submission counts could not load. Refresh to try popularity sorting again.'; $('sort-popular-button').disabled = true; }
 });

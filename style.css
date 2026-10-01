@@ -389,3 +389,59 @@ button {
         overflow-y: auto;
     }
 }
+/* Accessible controls keep the original blue-link appearance. */
+.interactive-tile,
+#about-button { border: 0; background: transparent; font-family: inherit; }
+#about-button { font-size: inherit; padding: 0 0 0 0.2em; }
+:focus-visible { outline: 2px solid blue; outline-offset: 4px; }
+#modal-header :focus-visible,
+#about-content :focus-visible { outline-color: #fff; }
+.modal { box-sizing: border-box; }
+#submission-modal .modal-content { height: 100%; min-width: 0; }
+#modal-header { box-sizing: border-box; flex: 0 0 clamp(220px, 20vw, 300px); width: auto; max-width: none; overflow-y: auto; }
+#submission-form { color: #fff; text-align: left; }
+#submission-form label { font-size: var(--font-size-small); }
+#image-input { max-width: 100%; font-family: inherit; color: #fff; }
+#image-input::file-selector-button { font-family: inherit; padding: 8px; cursor: pointer; }
+#image-preview { max-width: 100%; max-height: 130px; object-fit: contain; align-self: flex-start; }
+#image-preview[hidden] { display: none; }
+#filename-preview { height: auto; overflow-wrap: anywhere; }
+#submission-status { font-size: 14px; line-height: 1.35; margin: 0; overflow-wrap: anywhere; }
+button:disabled { cursor: wait; opacity: 0.65; }
+#submissions-container { flex: 1; min-width: 0; overflow: auto; }
+.submission-wrapper { width: var(--img-width); }
+.image-button { display: block; width: 100%; padding: 0; border: 0; background: transparent; cursor: grab; touch-action: none; font-family: inherit; }
+#submissions-container img { position: static; display: block; width: 100%; height: auto; max-height: 100px; object-fit: contain; }
+.caption { box-sizing: border-box; max-width: min(240px, 70vw); white-space: normal !important; overflow-wrap: anywhere; }
+.caption-right { right: 0 !important; }
+.submission-wrapper.caption-open .caption,
+.submission-wrapper:has(.image-button:focus-visible) .caption { visibility: visible; opacity: 1; }
+.submission-wrapper:has(.image-button:focus-visible),
+.submission-wrapper.caption-open { z-index: 102 !important; }
+.is-pending img { outline: 1px dashed blue; outline-offset: 3px; }
+#submissions-container.list-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 24px; align-content: start; padding: 20px; box-sizing: border-box; }
+.list-view .submission-wrapper { position: static; width: 100%; cursor: auto; }
+.list-view .image-button { cursor: default; touch-action: auto; }
+#submissions-container.list-view img { width: 100%; height: 150px; max-height: 150px; }
+.list-view .caption { position: static; visibility: visible; opacity: 1; max-width: none; text-align: left; margin-top: 8px; padding: 6px; }
+#about-content { box-sizing: border-box; max-height: 90dvh; overflow-y: auto; }
+#home-status:empty { display: none; }
+@media (max-width: 768px) {
+  #submission-modal .modal-content { height: auto; min-height: 100dvh; }
+  #modal-header { flex: none; width: 100%; max-height: 65dvh; }
+  #modal-header .modal-top { margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; }
+  #prompt-text { grid-column: 1 / -1; }
+  #modal-header.minimized { max-height: 0; padding: 0; }
+  #submissions-container { flex: none; height: 100dvh; min-height: 100dvh; }
+  #about-content { width: min(90dvw, 600px); max-width: none; }
+}
+.submission-wrapper .caption { width: max-content; max-width: min(240px, 50vw); }
+.list-view .submission-wrapper .caption { width: 100%; max-width: none; }
+@media (prefers-reduced-motion: reduce) { #modal-header.minimized { transition: none; } }
+
+@media (hover: none) {
+  .submission-wrapper:hover .caption { visibility: hidden; opacity: 0; }
+  .submission-wrapper.caption-open .caption,
+  .submission-wrapper:has(.image-button:focus-visible) .caption,
+  .list-view .submission-wrapper .caption { visibility: visible; opacity: 1; }
+}
